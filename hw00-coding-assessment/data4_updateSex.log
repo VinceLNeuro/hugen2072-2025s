@@ -1,0 +1,27 @@
+PLINK v1.90b7 64-bit (16 Jan 2023)
+Options in effect:
+  --bfile data4
+  --make-bed
+  --out data4_updateSex
+  --update-sex /ix1/hugen2072-2025s/ca/sex.txt
+
+Hostname: teach-cpu-n0.crc.pitt.edu
+Working directory: /ihome/mmarazita/til177/GitHub/hugen2072-2025s/hw00-coding-assessment
+Start time: Mon Jan 20 17:59:00 2025
+
+Random number seed: 1737413940
+192066 MB RAM detected; reserving 96033 MB for main workspace.
+3261 variants loaded from .bim file.
+524 people (0 males, 0 females, 524 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to data4_updateSex.nosex .
+--update-sex: 524 people updated.
+Using 1 thread.
+Before main variant filters, 524 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+Total genotyping rate is 0.998713.
+3261 variants and 524 people pass filters and QC.
+Note: No phenotypes present.
+--make-bed to data4_updateSex.bed + data4_updateSex.bim + data4_updateSex.fam
+... done.
+
+End time: Mon Jan 20 17:59:00 2025

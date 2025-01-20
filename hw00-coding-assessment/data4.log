@@ -1,0 +1,25 @@
+PLINK v1.90b7 64-bit (16 Jan 2023)
+Options in effect:
+  --bcf data4.bcf.gz
+  --make-bed
+  --out data4
+
+Hostname: teach-cpu-n0.crc.pitt.edu
+Working directory: /ihome/mmarazita/til177/GitHub/hugen2072-2025s/hw00-coding-assessment
+Start time: Mon Jan 20 17:43:01 2025
+
+Random number seed: 1737412981
+192066 MB RAM detected; reserving 96033 MB for main workspace.
+--bcf: data4-temporary.bed + data4-temporary.bim + data4-temporary.fam written.
+3261 variants loaded from .bim file.
+524 people (0 males, 0 females, 524 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to data4.nosex .
+Using 1 thread.
+Before main variant filters, 524 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+Total genotyping rate is 0.998713.
+3261 variants and 524 people pass filters and QC.
+Note: No phenotypes present.
+--make-bed to data4.bed + data4.bim + data4.fam ... done.
+
+End time: Mon Jan 20 17:43:01 2025

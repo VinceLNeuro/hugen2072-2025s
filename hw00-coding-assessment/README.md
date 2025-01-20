@@ -20,19 +20,20 @@
 
 3. (*DONE*) Then uses bcftools to create a data4.bcf.gz file that is sorted and indexed, and
 
-4. Is filtered to include only positions on chromosome 4;
+4. (*DONE*) Is filtered to include only positions on **chromosome 4**;
 
-5. Then uses PLINK to create a PLINK binary file set version of data4.bcf.gz called data4.{fam,bim,bed};
+5. (*DONE*) Then uses PLINK to create a PLINK binary file set version of data4.bcf.gz called data4.{fam,bim,bed};
 
-6. Then uses PLINK to update sex variable in the data4.fam file using the sex variable in sex.txt (without copying sex.txt to your own directory),
+6. (*DONE*) Then uses PLINK to update sex variable in the data4.fam file using the sex variable in sex.txt (without copying sex.txt to your own directory)
+    - `/ix1/hugen2072-2025s/ca/`
 
-7. Then uses PLINK, coupled with the phenotypes in phenotype.txt (without copying phenotype.txt to your own directory—and you should use phenotype.txt as an auxiliary file for the next few tasks without altering data4.fam to include phenotype data), to
+7. (*DONE*) Then uses PLINK, coupled with the phenotypes in phenotype.txt (without copying phenotype.txt to your own directory—and you should use phenotype.txt as an auxiliary file for the next few tasks without altering data4.fam to include phenotype data), to
 
-8. Calculate the allele frequencies of the markers in data4.{fam,bim,bed} in the cases only and
+8. (*DONE*) Calculate the allele frequencies of the markers in data4.{fam,bim,bed} in the **cases only** and
 
-9.  Calculate the allele frequencies of the markers in data4.{fam,bim,bed} in the controls only; then
+9. (*DONE*) Calculate the allele frequencies of the markers in data4.{fam,bim,bed} in the **controls only**; then
 
-10. Performs a GWAS of the phenotype using logistic regression with no covariates.
+10. (*DONE*) Performs a GWAS of the phenotype using logistic regression with no covariates.
 
 11. Then, create an RMarkdown file that knits to an HTML file which
 

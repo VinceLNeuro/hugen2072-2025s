@@ -1,0 +1,27 @@
+PLINK v1.90b7 64-bit (16 Jan 2023)
+Options in effect:
+  --bfile data4_updateSex
+  --ci 0.95
+  --logistic hide-covar beta
+  --out pheno_results
+  --pheno /ix1/hugen2072-2025s/ca/phenotype.txt
+
+Hostname: teach-cpu-n0.crc.pitt.edu
+Working directory: /ihome/mmarazita/til177/GitHub/hugen2072-2025s/hw00-coding-assessment
+Start time: Mon Jan 20 18:44:18 2025
+
+Random number seed: 1737416658
+192066 MB RAM detected; reserving 96033 MB for main workspace.
+3261 variants loaded from .bim file.
+524 people (245 males, 279 females) loaded from .fam.
+524 phenotype values present after --pheno.
+Using 1 thread.
+Before main variant filters, 524 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+Total genotyping rate is 0.998713.
+3261 variants and 524 people pass filters and QC.
+Among remaining phenotypes, 262 are cases and 262 are controls.
+Writing logistic model association results to pheno_results.assoc.logistic ...
+done.
+
+End time: Mon Jan 20 18:44:18 2025
