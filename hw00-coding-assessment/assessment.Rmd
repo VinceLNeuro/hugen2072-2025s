@@ -1,0 +1,169 @@
+---
+title: "Coding Assessment (Q11–20)"
+author: "Tianze (Vincent) Luo"
+date: "`r Sys.Date()`"
+output: 
+  html_document: 
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scoll: no
+    df_print: paged
+    number_sections: no
+    toc_depth: 4
+    code_folding: show
+    theme: cosmo
+    #css: "style.css"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+---
+
+# 0. Preparation
+
+**Load Package**
+```{r message=FALSE}
+rm(list=ls())
+library(tidyverse)
+library(data.table)
+library(GWASTools)
+
+```
+
+**Load Data**
+```{r}
+# two allele freq files
+maf_case = fread("hw00-coding-assessment/maf_CASE.frq", 
+                 header = TRUE, stringsAsFactors = FALSE, check.names = FALSE)
+
+maf_control = fread("hw00-coding-assessment/maf_CONTROL.frq",
+                    header = TRUE, stringsAsFactors = FALSE, check.names = FALSE)
+
+# logistic reg output
+gwas_logistic = fread("hw00-coding-assessment/pheno_results.assoc.logistic",
+                      header = TRUE, stringsAsFactors = FALSE, check.names = FALSE)
+```
+
+# 1. Visualizaitons
+
+## 1.1. Histogram of the **case** allele frequencies
+```{r}
+ggplot(aes(x=MAF), data = maf_case) + 
+  geom_histogram(binwidth = 0.02, color="black", fill="grey") + 
+  labs(title="Histogram of the case allele frequencies") +
+  theme_bw()
+```
+
+
+## 1.2. Histogram of the **control** allele frequencies
+```{r}
+ggplot(aes(x=MAF), data = maf_control) + 
+  geom_histogram(binwidth = 0.02, color="black", fill="grey") + 
+  labs(title="Histogram of the control allele frequencies") +
+  theme_bw()
+```
+
+
+## 1.3. Scatterplot of case-individuals’ allele frequencies (y axis) v.s. control-individuals’ allele frequencies (x axis)
+
+```{r}
+df_maf = data.frame(case = maf_case$MAF, 
+                    control = maf_control$MAF)
+
+ggplot(data=df_maf, aes(x=control, y=case)) + 
+  geom_point(color="darkblue", alpha=0.5, size=2) + 
+  labs(title = "Scatterplot of case-individuals’ allele frequencies (y axis) v.s.\n control-individuals’ allele frequencies (x axis)") + 
+  theme_bw()
+
+```
+
+
+## 1.4. Scatterplot of −log₁₀(p values) (y axis) vs chr4 basepair position (x axis)
+
+```{r}
+gwas_logistic = gwas_logistic %>% mutate(neg_log10p = -log10(P))
+head(gwas_logistic)
+
+ggplot(data = gwas_logistic, aes(x= BP, y= neg_log10p)) + 
+  geom_point(color="darkblue", size=1.2) + 
+  
+  labs(title="chr4 Manhattan Plot",
+       x = "chr4", y = latex2exp::TeX("$-log_{10}$($p$-value)") ) + 
+  theme_bw() + 
+  theme(axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12))
+
+```
+
+
+# 2. More Reports
+
+>18. Reports the marker and p value of the marker **with the lowest p value**; then
+
+Answer: **rs35197316 (P = 3.016e-12)**
+
+```{r}
+# checks
+str(gwas_logistic) #make sure of the data type
+gwas_logistic$TEST %>% unique()
+
+# sort the data frame by P
+gwas_logistic %>% 
+  arrange(P) %>%
+  select(SNP, P)
+
+```
+
+>19. Loads the `snp_annot.RData` workspace and merges the p values into the SNP annotation data frame object `snp_annot_df` in such a way that
+>20. The order of the SNPs in snp_annot_df is unchanged.
+
+```{r}
+# loads
+load("/ix1/hugen2072-2025s/ca/snp_annot.RData", verbose = TRUE)
+
+class(snp_annot_df)
+typeof(snp_annot_df)
+snp_annot_df@data
+
+
+# Clean: need rsID as the key for merging
+df_rsid.p = gwas_logistic %>% select(SNP, P)
+df_rsid.p
+
+
+# Merge: The order of the SNPs in snp_annot_df is unchanged
+# ***snp_annot_df@data < df_rsid.p
+
+#check the dup & other things in key
+length(snp_annot_df@data$rsID)
+length(df_rsid.p$SNP)
+all(df_rsid.p$SNP %in% snp_annot_df@data$rsID)
+# duplicated(snp_annot_df@data$rsID) %>% sum()
+# duplicated(df_rsid.p$SNP) %>% sum()
+# is.na(snp_annot_df@data$rsID) %>% sum()
+# is.na(df_rsid.p$SNP) %>% sum()
+
+updated_data = 
+  left_join(x = snp_annot_df@data,
+            y = df_rsid.p,
+            by = join_by(rsID == SNP))
+
+
+#check if order changed
+all(updated_data$rsID == snp_annot_df@data$rsID) #TRUE
+
+
+#### Update the data of the S4 object ####
+pData(snp_annot_df) <- updated_data
+
+str(snp_annot_df)
+head(snp_annot_df@data)
+```
+
+
+```{r}
+sessionInfo()
+```

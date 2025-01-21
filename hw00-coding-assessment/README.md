@@ -9,8 +9,8 @@
     - (*DONE*) Your slurm script file for steps 1–10: `assessment_slurm.sh`
         - The slurm log file for the script when you ran the script: `coding_assessment-slurm_6367.out`
 
-    - The RMarkdown file for steps 11–20
-        - The knitted HTML file produced by the RMarkdown file
+    - (*DONE*) The RMarkdown file for steps 11–20: `assessment.Rmd`
+        - The knitted HTML file produced by the RMarkdown file: `assessment.html`
 
 <br>
 
@@ -37,22 +37,22 @@
 
 10. (*DONE*) Performs a GWAS of the phenotype using logistic regression with no covariates.
 
-11. Then, create an RMarkdown file that knits to an HTML file which
+11. (*DONE*) Then, create an RMarkdown file that knits to an HTML file which
 
-12. Reads the two allele frequency files and the logistic regression output into R, and
+12. (*DONE*) Reads the two allele frequency files and the logistic regression output into R, and
 
-13. Plots a histogram of the case allele frequencies,
+13. (*DONE*) Plots a histogram of the case allele frequencies,
 
-14. Plots a histogram of the control allele frequencies,
+14. (*DONE*) Plots a histogram of the control allele frequencies,
 
-15. Plots a scatterplot of the case individuals’ allele frequencies (y axis)
+15. (*DONE*) Plots a scatterplot of the case individuals’ allele frequencies (y axis)
 
-16. Versus the control individuals’ allele frequencies (x axis),
+16. (*DONE*) Versus the control individuals’ allele frequencies (x axis),
 
-17. Plots a scatterplot of −log₁₀(p values) (y axis) versus chr4 basepair position (x axis),
+17. (*DONE*) Plots a scatterplot of −log₁₀(p values) (y axis) versus chr4 basepair position (x axis),
 
-18. Reports the marker and p value of the marker with the lowest p value; then
+18. (*DONE*) Reports the marker and p value of the marker with the lowest p value; then
 
-19. Loads the snp_annot.RData workspace and merges the p values into the SNP annotation data frame object snp_annot_df in such a way that
+19. (*DONE*) Loads the snp_annot.RData workspace and merges the p values into the SNP annotation data frame object snp_annot_df in such a way that
 
-20. The order of the SNPs in snp_annot_df is unchanged.
+20. (*DONE*) The order of the SNPs in snp_annot_df is unchanged.
