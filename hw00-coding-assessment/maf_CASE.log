@@ -5,19 +5,19 @@ Options in effect:
   --keep aux_caseKeep.txt
   --out maf_CASE
 
-Hostname: teach-cpu-n0.crc.pitt.edu
+Hostname: teach-cpu-n1.crc.pitt.edu
 Working directory: /ihome/mmarazita/til177/GitHub/hugen2072-2025s/hw00-coding-assessment
-Start time: Mon Jan 20 18:24:18 2025
+Start time: Mon Jan 20 19:20:35 2025
 
-Random number seed: 1737415458
+Random number seed: 1737418835
 192066 MB RAM detected; reserving 96033 MB for main workspace.
 3261 variants loaded from .bim file.
 524 people (245 males, 279 females) loaded from .fam.
 --keep: 262 people remaining.
-Using 1 thread.
+Using 1 thread (no multithreaded calculations invoked).
 Before main variant filters, 262 founders and 0 nonfounders present.
 Calculating allele frequencies... done.
 Total genotyping rate in remaining samples is 0.998674.
 --freq: Allele frequencies (founders only) written to maf_CASE.frq .
 
-End time: Mon Jan 20 18:24:18 2025
+End time: Mon Jan 20 19:20:35 2025

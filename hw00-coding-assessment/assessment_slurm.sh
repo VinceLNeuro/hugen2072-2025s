@@ -8,8 +8,8 @@
 
 #SBATCH --nodes=1 #default - all cores on one machine
 #SBATCH --ntasks-per-node=1 #default
-#SBATCH --cpus-per-task=2 
-#SBATCH --mem=2000MB #2GB
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=8000MB #8GB
 #SBATCH --mail-user=til177@pitt.edu
 #SBATCH --mail-type=END,FAIL
 
@@ -98,4 +98,4 @@ plink --bfile data4_updateSex --logistic hide-covar beta --ci 0.95 \
 
 echo "Job ended at: $(date) on node $HOSTNAME"
 
-crc-job-stats
+# crc-job-stats #set to fail

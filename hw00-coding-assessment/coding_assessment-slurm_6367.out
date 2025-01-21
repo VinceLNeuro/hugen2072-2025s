@@ -1,0 +1,190 @@
+
+echo "Job started at: $(date)"
+Job started at: Mon Jan 20 19:20:32 EST 2025
+
+
+######## Main analysis ########
+
+#### 2. Copies data.vcf to your working directory
+cp -v /ix1/hugen2072-2025s/ca/data.vcf ./
+‘/ix1/hugen2072-2025s/ca/data.vcf’ -> ‘./data.vcf’
+
+
+#### 3. data.vcf -> data4.bcf.gz (that is sorted and indexed)
+# sort (required to be .vcf/.bcf) -> convert (.bcf.gz)     -> index (-c for bcf files)
+bcftools sort data.vcf | bcftools view -Ob > data.bcf.gz
+Writing to /scratch/slurm-6367/bcftools.cNb1vG
+Merging 1 temporary files
+Cleaning
+Done
+bcftools index -c data.bcf.gz
+
+##check
+ls data.* #>data.bcf.gz  data.bcf.gz.csi  data.vcf
+data.bcf.gz
+data.bcf.gz.csi
+data.vcf
+# bcftools view data.bcf.gz -G | grep -v "##" | head | column -t #start with chr3
+bcftools view data.bcf.gz -GH | awk '{print $1}' | sort -s | uniq -c #check all chr -> only 3 & 4
+   3255 3
+   3261 4
+
+
+#### 4. Is filtered to include only positions on chromosome 4 -> `data4.bcf.gz`
+bcftools view data.bcf.gz -r4 -Ob > data4.bcf.gz
+
+##check
+bcftools view data4.bcf.gz -GH | cut -f1 | sort | uniq -c #only chr4
+   3261 4
+
+
+#### (start of PLINK) 5. Then uses PLINK to create a PLINK binary file set version of data4.bcf.gz called data4.{fam,bim,bed};
+plink --bcf data4.bcf.gz --make-bed --out data4
+PLINK v1.90b7 64-bit (16 Jan 2023)             www.cog-genomics.org/plink/1.9/
+(C) 2005-2023 Shaun Purcell, Christopher Chang   GNU General Public License v3
+Logging to data4.log.
+Options in effect:
+  --bcf data4.bcf.gz
+  --make-bed
+  --out data4
+
+192066 MB RAM detected; reserving 96033 MB for main workspace.
+--bcf: 1k variants complete.--bcf: 2k variants complete.--bcf: 3k variants complete.--bcf: data4-temporary.bed + data4-temporary.bim + data4-temporary.fam written.
+3261 variants loaded from .bim file.
+524 people (0 males, 0 females, 524 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to data4.nosex .
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 524 founders and 0 nonfounders present.
+Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
+Total genotyping rate is 0.998713.
+3261 variants and 524 people pass filters and QC.
+Note: No phenotypes present.
+--make-bed to data4.bed + data4.bim + data4.fam ... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
+
+
+#### 6. Then uses PLINK to update sex variable in the data4.fam file, using the sex variable in sex.txt (without copying sex.txt to your own directory),
+sex_auxFile="/ix1/hugen2072-2025s/ca/sex.txt"
+# "--update-sex expects a file with FIDs and IIDs in the first two columns, 
+#   and sex information (1 or M = male, 2 or F = female, 0 = missing) in the (n+2)th column. 
+#   If no second parameter is provided, n defaults to 1."
+
+plink --bfile data4 --update-sex $sex_auxFile \
+    --make-bed --out data4_updateSex
+PLINK v1.90b7 64-bit (16 Jan 2023)             www.cog-genomics.org/plink/1.9/
+(C) 2005-2023 Shaun Purcell, Christopher Chang   GNU General Public License v3
+Logging to data4_updateSex.log.
+Options in effect:
+  --bfile data4
+  --make-bed
+  --out data4_updateSex
+  --update-sex /ix1/hugen2072-2025s/ca/sex.txt
+
+192066 MB RAM detected; reserving 96033 MB for main workspace.
+3261 variants loaded from .bim file.
+524 people (0 males, 0 females, 524 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to data4_updateSex.nosex .
+--update-sex: 524 people updated.
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 524 founders and 0 nonfounders present.
+Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
+Total genotyping rate is 0.998713.
+3261 variants and 524 people pass filters and QC.
+Note: No phenotypes present.
+--make-bed to data4_updateSex.bed + data4_updateSex.bim + data4_updateSex.fam
+... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
+
+
+#### 7,8,9 PLINK: coupled with the phenotypes in phenotype.txt (without copying phenotype.txt to your own directory—and you should use phenotype.txt as an auxiliary file for the next few tasks without altering data4.fam to include phenotype data), to
+# - Calculate the allele frequencies of the markers in data4.{fam,bim,bed} in the cases only and
+# - Calculate the allele frequencies of the markers in data4.{fam,bim,bed} in the controls only; then
+pheno_auxFile="/ix1/hugen2072-2025s/ca/phenotype.txt"
+# cut -d" " -f3 $pheno_auxFile | sort | uniq -c
+    # 262 1
+    # 262 2
+
+## extract case(=2) / control(=1) -> `keep`
+    #"--keep accepts a space/tab-delimited text file with family IDs in the first column and within-family IDs in the second column, and removes all unlisted samples from the current analysis."
+awk '$3==2 {print $1,$2}' $pheno_auxFile > ./aux_caseKeep.txt
+awk '$3==1 {print $1,$2}' $pheno_auxFile > ./aux_controlKeep.txt
+
+## calculate allele-freq for CASE
+plink --bfile data4_updateSex --keep aux_caseKeep.txt --freq --out maf_CASE
+PLINK v1.90b7 64-bit (16 Jan 2023)             www.cog-genomics.org/plink/1.9/
+(C) 2005-2023 Shaun Purcell, Christopher Chang   GNU General Public License v3
+Logging to maf_CASE.log.
+Options in effect:
+  --bfile data4_updateSex
+  --freq
+  --keep aux_caseKeep.txt
+  --out maf_CASE
+
+192066 MB RAM detected; reserving 96033 MB for main workspace.
+3261 variants loaded from .bim file.
+524 people (245 males, 279 females) loaded from .fam.
+--keep: 262 people remaining.
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 262 founders and 0 nonfounders present.
+Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
+Total genotyping rate in remaining samples is 0.998674.
+--freq: Allele frequencies (founders only) written to maf_CASE.frq .
+## for CONTROL
+plink --bfile data4_updateSex --keep aux_controlKeep.txt --freq --out maf_CONTROL
+PLINK v1.90b7 64-bit (16 Jan 2023)             www.cog-genomics.org/plink/1.9/
+(C) 2005-2023 Shaun Purcell, Christopher Chang   GNU General Public License v3
+Logging to maf_CONTROL.log.
+Options in effect:
+  --bfile data4_updateSex
+  --freq
+  --keep aux_controlKeep.txt
+  --out maf_CONTROL
+
+192066 MB RAM detected; reserving 96033 MB for main workspace.
+3261 variants loaded from .bim file.
+524 people (245 males, 279 females) loaded from .fam.
+--keep: 262 people remaining.
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 262 founders and 0 nonfounders present.
+Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
+Total genotyping rate in remaining samples is 0.998752.
+--freq: Allele frequencies (founders only) written to maf_CONTROL.frq .
+
+
+#### 10. Performs a GWAS of the phenotype using logistic regression with  * no covariates *.
+
+# "--pheno causes phenotype values to be read from the 3rd column of the specified space- or tab-delimited file, instead of the .fam or .ped file. 
+#   The first and second columns of that file must contain family and within-family IDs, respectively."
+
+plink --bfile data4_updateSex --logistic hide-covar beta --ci 0.95 \
+    --pheno $pheno_auxFile \
+    --out pheno_results
+PLINK v1.90b7 64-bit (16 Jan 2023)             www.cog-genomics.org/plink/1.9/
+(C) 2005-2023 Shaun Purcell, Christopher Chang   GNU General Public License v3
+Logging to pheno_results.log.
+Options in effect:
+  --bfile data4_updateSex
+  --ci 0.95
+  --logistic hide-covar beta
+  --out pheno_results
+  --pheno /ix1/hugen2072-2025s/ca/phenotype.txt
+
+192066 MB RAM detected; reserving 96033 MB for main workspace.
+3261 variants loaded from .bim file.
+524 people (245 males, 279 females) loaded from .fam.
+524 phenotype values present after --pheno.
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 524 founders and 0 nonfounders present.
+Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
+Total genotyping rate is 0.998713.
+3261 variants and 524 people pass filters and QC.
+Among remaining phenotypes, 262 are cases and 262 are controls.
+Writing logistic model association results to pheno_results.assoc.logistic ...
+0%15%31%47%62%78%94%done.
+#`pheno_results.assoc.logistic`
+
+
+######## Main analysis end ########
+
+echo "Job ended at: $(date) on node $HOSTNAME"
+Job ended at: Mon Jan 20 19:20:35 EST 2025 on node teach-cpu-n1
+
+# crc-job-stats #set to fail

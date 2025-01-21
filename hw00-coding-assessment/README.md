@@ -5,8 +5,10 @@
 - `crc-interactive --teach --account hugen2072-2025s -t 3:00:00`
 
 - What you must submit to Canvas:
-    - Your slurm script file for steps 1–10
-        - The slurm log file for the script when you ran the script
+
+    - (*DONE*) Your slurm script file for steps 1–10: `assessment_slurm.sh`
+        - The slurm log file for the script when you ran the script: `coding_assessment-slurm_6367.out`
+
     - The RMarkdown file for steps 11–20
         - The knitted HTML file produced by the RMarkdown file
 
