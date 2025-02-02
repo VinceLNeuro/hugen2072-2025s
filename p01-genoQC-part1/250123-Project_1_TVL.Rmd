@@ -6,7 +6,8 @@ output:
   html_document:
     code_folding: show
     toc: true
-    toc_float: true
+    toc_float: 
+      collapsed: no
     df_print: paged
     number_sections: no
     theme: cosmo
@@ -271,19 +272,28 @@ pData(snpAnnot) %>% select(chromosome, snpID) %>% group_by(chromosome) %>% count
 
 ## Part 1 - Missing Call Rate for Samples and SNPs
 
-The basic `{GWASTools}` functions for missingness are `missingGenotypeBySnpSex()` and `missingGenotypeByScanChrom()`. `missingGenotypeBySnpSex()` returns a list of three objects: `missing.counts`, `scans.per.sex`, and `missing.fraction`. Read the help file for this function so that you understand what information is contained in these and how the Y chromosome is treated by sex (where sex is as defined in the scan annotation). Similarly, `missingGenotypeByScanChrom()` returns `missing.counts`, `snps.per.chr`, and `missing.fraction`.
+The basic `{GWASTools}` functions for missingness are `missingGenotypeBySnpSex()` and `missingGenotypeByScanChrom()`. 
+
+- `missingGenotypeBySnpSex()` returns a list of three objects: `missing.counts`, `scans.per.sex`, and `missing.fraction`. Read the help file for this function so that you understand what information is contained in these and how the Y chromosome is treated by sex (where sex is as defined in the scan annotation). 
+
+- Similarly, `missingGenotypeByScanChrom()` returns `missing.counts`, `snps.per.chr`, and `missing.fraction`.
+
 
 There are four basic missingness calculations to be done, in the following order.
 
-1. Calculate `missing.n1` = fraction of genotype calls missing over all samples (except that annotated ‘female’ individuals are excluded for Y chr SNPs)
+1. Calculate `missing.n1` = fraction of **genotype calls** missing over all samples (except that annotated ‘female’ individuals are excluded for Y chr SNPs)
 
-2. Calculate `missing.e1` = missing call rate per sample over all SNPs (excluding SNPs with all calls missing)
+2. Calculate `missing.e1` = missing call rate **per sample** over all SNPs (excluding SNPs with all calls missing)
 
-3. Calculate `missing.n2` = call rate per SNP over all samples whose `missing.e1` is less than `0.05`
+3. Calculate `missing.n2` = call rate **per SNP** over all samples whose `missing.e1` is less than `0.05`
 
-4. Calculate `missing.e2` = missing call rate per sample over all SNPs with `missing.n2` values less than `0.05`
+4. Calculate `missing.e2` = missing call rate **per sample** over all SNPs with `missing.n2` values less than `0.05`
 
 We'll want to store the missingness information in the annotation data frames as we proceed.
+
+<br>
+
+### Round 1
 
 Here's how to calculate and store `missing.n1`.
 
@@ -292,10 +302,10 @@ Here's how to calculate and store `missing.n1`.
 ### Using missingGenotypeBySnpSex to calculate missing.n1 ###
 
 #   First look at some of the results
-
 miss <- missingGenotypeBySnpSex(genoData)
 names(miss)
-head(miss$missing.counts)
+
+head(miss$missing.counts) #all snps
 miss$scans.per.sex
 head(miss$missing.fraction)
 
@@ -306,19 +316,19 @@ allequal(snpAnnot$snpID, as.numeric(names(miss$missing.fraction)))
 
 #   Then go ahead and add missing.n1 as a new annotation data column, and update
 #   the metadata
+pData(snpAnnot)$missing.n1 <- miss$missing.fraction
+varMetadata(snpAnnot)["missing.n1", "labelDescription"] <- 
+  paste("fraction of genotype calls missing over all samples, except that females are excluded for Y chr SNPs")
 
-snpAnnot$missing.n1 <- miss$missing.fraction
-varMetadata(snpAnnot)["missing.n1", "labelDescription"] <-
-  paste(
-    "fraction of genotype calls missing over all samples, except that females are excluded for Y chr SNPs"
-  )
+## checks
+getVariableNames(snpAnnot)
+getMetadata(snpAnnot) %>% tail(n=2)
 
 ### Explore the missing call rate per probes a little more
 
 #   Look at the distribution of missingness for all the probes
-
 hist(
-  snpAnnot$missing.n1,
+  pData(snpAnnot)$missing.n1,
   ylim = c(0, 100),
   xlab = "SNP missing call rate",
   main = "Missing Call Rate for All Probes"
@@ -327,14 +337,16 @@ hist(
 #   How many SNPs are missing a genotype for every single sample? Apparently
 #   there are 151 such SNPs
 
-sum(snpAnnot$missing.n1 == 1)
+sum( pData(snpAnnot)$missing.n1 == 1 )
 
 #   Store a vector containing the snpIDs of all the SNPs with missingness of
 #   100%
 
-snpexcl <- snpAnnot$snpID[snpAnnot$missing.n1 == 1]
+snpexcl <- pData(snpAnnot)$snpID[snpAnnot$missing.n1 == 1]
 
 ```
+
+<br>
 
 Now we calculate and store `missing.e1`. The steps are described in the comments below.
 
@@ -351,28 +363,39 @@ miss <- missingGenotypeByScanChrom(genoData, snp.exclude = snpexcl)
 #   missingGenotypeByScanChrom is the same as the order of the scanIDs in the
 #   annotation data frame
 
-allequal(names(miss$missing.fraction), scanAnnot$scanID)
+allequal(names(miss$missing.fraction) %>% as.numeric(), 
+         pData(scanAnnot)$scanID)
 
 #   Make a new column in scanAnnot called missing.e1 and store the per-scan
 #   missingness from missingGenotypeByScanChrom there
 
-scanAnnot$missing.e1 <- miss$missing.fraction
+pData(scanAnnot)$missing.e1 <- miss$missing.fraction
 
-#   Update the scanAnnot metadata
+#   Update the scanAnnot metadata - using setter functions
 
-varMetadata(scanAnnot)["missing.e1", "labelDescription"] <-
+varMetadata(scanAnnot)["missing.e1", "labelDescription"] =
   "fraction of genotype calls missing over all snps with missing.n1<1 except that Y chr SNPs are excluded for females"
+
+
+## check
+getVariableNames(scanAnnot)
+getMetadata(scanAnnot) %>% tail(n=2)
+
 
 # We can check summary statistics and make a histogram, too
 
 summary(scanAnnot$missing.e1)
 hist(
   scanAnnot$missing.e1,
-  xlab = "Fraction of missing calls over all probes",
+  xlab = "Fraction of sample-missingness across all probes",
   main = "Histogram of Sample Missing Call Rate for All Samples"
 )
 
 ```
+
+<br>
+
+### Round 2
 
 Now, supply your code to calculate and store `missing.n2`. The steps you should follow are described in the comments below. 
 
@@ -383,27 +406,46 @@ Now, supply your code to calculate and store `missing.n2`. The steps you should 
 #   Recall that missing.n2 = call rate per SNP over all samples whose missing.e1
 #   is less than 0.05.
 
-#   Since no sample had missing.e1 > 0.05 in this dataset, we don't actually
-#   have to exclude any samples.
+#       Since no sample had missing.e1 > 0.05 in this dataset, we don't actually
+#       have to exclude any samples.
 
 #   However, let's proceed as if there were some samples with missing.e1 > 0.05.
 
-#   Make a vector of the scanIDs for the samples with high missing.e1.
+# Make a vector of the scanIDs for the samples with high missing.e1.
+scan_exclude = 
+  pData(scanAnnot) %>% 
+  filter(missing.e1 > 0.05) %>%
+  select(scanID) %>% 
+  pull()
+
+length(scan_exclude)
 
 #   Apply the missingGenotypeBySnpSex function again, using the scan.exclude
 #   argument.
+miss = missingGenotypeBySnpSex(genoData = genoData, scan.exclude = scan_exclude)
 
 #   Store missing.n2 as a new column in snpAnnot.
+## same sequence
+all.equal( names(miss$missing.fraction) %>% as.numeric(), 
+           pData(snpAnnot)$snpID ) #TRUE
+
+## assign to annot data
+pData(snpAnnot)$missing.n2 = miss$missing.fraction
 
 #   Update the metadata for snpAnnot!
+varMetadata(snpAnnot)["missing.n2", "labelDescription"] = "SNP-level missingness, in samples with sample-missing rate (missing.e1) <= 5%"
 
 #   The labelDescription for missing.n2 should be "fraction of genotype calls
 #   missing over all samples with missing.e1 < 0.05 except that females are
 #   excluded for Y chr SNPs"
 
-#   <Your code goes here>
+## checks
+getVariableNames(snpAnnot)
+getMetadata(snpAnnot) %>% tail(n=2)
 
 ```
+
+<br>
 
 Write code to calculate and store `missing.e2`. The steps you should follow are described in the comments below.
 
@@ -415,19 +457,33 @@ Write code to calculate and store `missing.e2`. The steps you should follow are 
 #   missing.n2 values less than 0.05
 
 #   Store a vector with the snpIDs of all probes with missing.n2 >= 0.05
+snp_exclude_r2 = 
+  pData(snpAnnot) %>%
+  filter(missing.n2 >= 0.05) %>%
+  pull(snpID) #snps with missing>5%
+
+length(snp_exclude_r2)
 
 #   Apply missingGenotypeByScanChrom to genoData again, using the snp.exclude
 #   argument to exclude the SNPs with missing.n2 >= 0.05 (why do we do this?)
 
+miss = missingGenotypeByScanChrom(genoData, snp.exclude = snp_exclude_r2)
+  ## We do this to ensure that the bad snps are removed prior to removing bad samples, which has a larger effect on downstream analysis.
+
+
 #   Make a new column in scanAnnot called missing.e2 to store the missingness
 #   per-scan you just calculated
+all.equal( names(miss$missing.fraction) %>% as.numeric(), 
+           pData(scanAnnot)$scanID ) #same sequence
+
+pData(scanAnnot)$missing.e2 = miss$missing.fraction
 
 #   Update the scanAnnot metadata
+varMetadata(scanAnnot)["missing.e2","labelDescription"] = "Sample-missingness across all snps with missing.n2 < 0.05, except that Y chr SNPs are excluded for females"
 
-#   The labelDescription should say "fraction of genotype calls missing over all
-#   snps with missing.n2 < 0.05 except that Y chr SNPs are excluded for females"
-
-#   <Your code goes here>
+## checks
+getVariableNames(scanAnnot)
+getMetadata(scanAnnot) %>% tail(n=2)
 
 ```
 
@@ -435,31 +491,83 @@ Write code to calculate and store `missing.e2`. The steps you should follow are 
 
 Summarize the filtering you've accomplished at this step. Include the following in your answer the following questions.
 
-* (First, make sure you've filled in the calculations of `missing.n2` and `missing.e2` in the chunks above.)
+* (DONE) (First, make sure you've filled in the calculations of `missing.n2` and `missing.e2` in the chunks above.)
 
-* How many SNPs and samples were genotyped?
+* (DONE) How many SNPs and samples were genotyped?
 
-* Briefly describe the purpose of doing this step in two rounds (why do we calculate both missingnesses twice?)
+* (DONE) Briefly describe the purpose of doing this step in two rounds (why do we calculate both missingnesses twice?)
 
-* What were the median, mean, and maximum per-sample missingness (use `missing.e2`)? Make a histogram of `missing.e2`.
+* (DONE) What were the median, mean, and maximum per-sample missingness (use `missing.e2`)? Make a histogram of `missing.e2`.
 
-* How many samples had no missing calls at all (use `missing.e2`)?
+* (DONE) How many samples had no missing calls at all (use `missing.e2`)?
 
-* Are the samples generally "good"? How many should be excluded from downstream analyses?
+* (DONE) Are the samples generally "good"? How many should be excluded from downstream analyses?
 
-* How many SNPs had a 100% missing call rate (use `missing.n1`)?
+* (DONE) How many SNPs had a 100% missing call rate (use `missing.n1`)?
 
-* What are the median, mean, and maximum per-SNP missingnesses (use `missing.n2`)? How many SNPs are missing no calls at all?
+* (DONE) What are the median, mean, and maximum per-SNP missingnesses (use `missing.n2`)? How many SNPs are missing no calls at all?
 
-* Make a histogram of `missing.n2`.
+* (DONE) Make a histogram of `missing.n2`.
 
-* How many SNPs are filtered out and how many remain if you retain only SNPs with `missing.n2` < 0.05?
+* (DONE) How many SNPs are filtered out and how many remain if you retain only SNPs with `missing.n2` < 0.05?
 
-* Make a histogram showing `missing.n2` for the remaining SNPs.
+* (DONE) Make a histogram showing `missing.n2` for the remaining SNPs.
+
+<br>
+
+**Report**: We have finished 2 rounds of missingness checks. In this study, 3300 SNPs and 77 samples were genotyped. Our rationale of performing 2 rounds of missingness check is that for the first round, we try to capture the problematic SNPs (totally missed) and, after excluding them, the problematic samples with high missing rate. Based on the primarily filtered data, we can further refine the missingness calculation in the second round, which will be used in the downstream pipeline.
+
+The median, mean, and max sample-missingness were calculated to be 0.00065, 0.0018, and 0.024, respectively. The histogram for `missing.e2` is shown below, which is named as "Histogram of sample-missingness (missing.e2) across high-quality SNPs". There were 6 samples with no missing calls at all (i.e., sample-level missingness = 0). *Sample-level missing rate < 5%* were defined as generally "good", and all samples met this criteria and no samples should be excluded in the downstream analyses. 
+
+There were 151 SNPs with 100% missing call rate. For the SNP-level missingness, we have median=0, mean=0.049, max=1. 2755 SNPs were missing no calls at all (i.e., snp-level missingness = 0). We created a histogram for `missing.n2` below, which is named "Histogram of SNP-level missingness (missing.n2) across high-quality samples". Using a filtering threshold of *SNP-level missingness < 0.05*, we kept 3095 SNPs while removing 205 SNPs. The histogram for the remaining SNPs were generated, named "Histogram of SNP-level missingness for high-quallity SNPs across high-quality samples".
+
 
 ```{r part1_report}
+# check for missing.n2 & missing.e2
+# pData(snpAnnot)$missing.n2
+# pData(scanAnnot)$missing.e2
 
-#   <Your code goes here>
+pData(snpAnnot)$snpID %>% unique() %>% length()
+pData(scanAnnot)$scanID %>% unique() %>% length()
+
+# What were the median, mean, and maximum per-sample missingness (use `missing.e2`)? Make a histogram of `missing.e2`.
+summary( pData(scanAnnot)$missing.e2 ) 
+hist(pData(scanAnnot)$missing.e2, 
+     ylim = c(0, 100), 
+     xlab = "Sample missingness",
+     main = "Histogram of sample-missingness (missing.e2)\n across high-quality SNPs")
+
+# How many samples had no missing calls at all (use `missing.e2`)?
+sum( pData(scanAnnot)$missing.e2 == 0 )
+
+# Are the samples generally "good"? How many should be excluded from downstream analyses?
+sum( pData(scanAnnot)$missing.e2 >= 0.05 )
+
+# How many SNPs had a 100% missing call rate (use `missing.n1`)?
+sum( pData(snpAnnot)$missing.n1 == 1 )
+
+# What are the median, mean, and maximum per-SNP missingnesses (use `missing.n2`)? How many SNPs are missing no calls at all?
+summary( pData(snpAnnot)$missing.n2 ) #median=0, mean=0.049, max=1
+sum( pData(snpAnnot)$missing.n2 == 0 )
+
+# Make a histogram of `missing.n2`
+hist(pData(snpAnnot)$missing.n2,
+     xlab = "SNP-level missingness",
+     main = "Histogram of SNP-level missingness (missing.n2)\n across high-quality samples")
+
+# How many SNPs are filtered out and how many remain if you retain only SNPs with `missing.n2` < 0.05?
+## kept
+sum( pData(snpAnnot)$missing.n2 < 0.05 ) #3095 kept
+sum( pData(snpAnnot)$missing.n2 >= 0.05 ) #205 lost
+# length(snp_exclude_r2)
+
+# Make a histogram showing `missing.n2` for the remaining SNPs.
+pData(snpAnnot) %>%
+  filter( !(snpID %in% snp_exclude_r2) ) %>%
+  # summarize(tmp=max(missing.n2)) #check
+  pull(missing.n2) %>%
+  hist(., xlab="SNP-level missingness",
+       main="Histogram of SNP-level missingness\n for high-quallity SNPs across high-quality samples")
 
 ```
 
