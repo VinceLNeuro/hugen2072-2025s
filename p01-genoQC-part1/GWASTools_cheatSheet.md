@@ -12,8 +12,8 @@
 ## 2. Get **Array data** (genotype & intensity{qxy, bl}) (`.gds`) & Combine with Annotation data
 
 - `GdsGenotypeReader("path")` & `GdsIntensityReader("path")` to open the `.gds` files that contain the array data. 
-  - *Class*: `GdsGenotypeReader`, `GdsIntensityReader`
-  - *Get data*: `@data`, `@snpAnnot`, `@scanAnnot`
+  - *class*: `GdsGenotypeReader`, `GdsIntensityReader`
+  - *functions*: `getX()`, `getY()` for intensity variables data
 
 - Then, `GenotypeData()` & `IntensityData()` to **combine** them with the SNP- and sample-annotation to create objects with the data-type required by functions in the following pipeline
 
@@ -22,11 +22,11 @@
     GenotypeData(gds_geno, snpAnnot = snpAnnot, scanAnnot = scanAnnot)
     ```
 
- 
+
 ## 3. {GWASTools} QC Step 1: Missingness
 
 ```r
-missingGenotypeBySnpSex(genoData,            #GenotypeData object
+missingGenotypeBySnpSex(genoData, #GenotypeData object
                         scan.exclude = NULL, #vector, `scanID` to be excluded
                         verbose = TRUE)
 ```
@@ -42,7 +42,7 @@ missingGenotypeBySnpSex(genoData,            #GenotypeData object
 
 ```r
 missingGenotypeByScanChrom(GenotypeData, 
-                           snp.exclude = NULL, #vector, snpID to be excluded from missing count
+                           snp.exclude = NULL, #vector, `snpID` to be excluded from missing count
                            verbose = TRUE)
 ```
 
@@ -54,4 +54,32 @@ missingGenotypeByScanChrom(GenotypeData,
   3. `missing.fraction`: A vector, containing the **missingness for each scan** over all chromosomes, excluding the Y chromosome for females.
 
 
+## 4. {GWASTools} QC Step 2: Reported Sex vs Inferred Sex (possibly sex-chromosome aneuploidy)
+
+**Data Type** to work on: IntensityData (`qxyData`)
+    
+
+```r
+meanIntensityByScanChrom(intenData, #IntensityData object
+                        vars = c("X", "Y"), #char-vector for intensity variables names
+                                            #(two allele-specific probes to determine the SNP genotype)
+                        snp.exclude = NULL, 
+                        verbose = TRUE)
+```
+- Output (partial):  
+    1. **[target]`$mean.intensity`**: matrix (row=scan, col=chromosome), containing mean of summed intensity values (integrated/summed X probe and Y probe values) for each scan for each chromosome
+    
+    2. `$mean.X`: matrix containing means of intensity values for **just X probe**
+
+<br>
+
+```r
+hetByScanChrom(genoData, snp.exclude = NULL, verbose = TRUE)
+``` 
+- Output: matrix (row=scan, col=chr), containing <u>chromosomes heterozygosity rates</u>, including a column **"A" for all autosomes**.
+
+  
+  
+  
+  
 

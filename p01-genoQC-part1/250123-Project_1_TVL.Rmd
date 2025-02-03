@@ -571,6 +571,10 @@ pData(snpAnnot) %>%
 
 ```
 
+<hr>
+
+<br>
+
 ## Part 2 - Inferred vs. Reported Sex and Relatedness
 
 To investigate discrepancies in inferred vs. reported sex (and, possibly, sex chromosome aneuploidies), we will produce four plots that summarize each scan's heterozygosity and intensity for the sex chromosomes:
@@ -588,8 +592,8 @@ Recall that the intensity data was read in earlier as `qxyData`. Before making o
 ```{r sex_check, eval=TRUE}
 
 #   Look at the structure of the IntensityData object
-
 qxyData
+qxyData@data
 
 #   For each probe, there's a numerical ID, chromosome, position, rsID
 
@@ -601,111 +605,85 @@ qxyData
 
 #   Apply the meanIntensityByScanChrom function to get the intensity averages.
 #   (We're not going to use all of the output from this function)
-
 inten.by.chrom <- meanIntensityByScanChrom(qxyData)
 
-#   Extract the matrix containing the mean intensity for each chromosome for
-#   each scan
-
+#   Extract the matrix containing the mean intensity for each chromosome for each scan
 names(inten.by.chrom)
 mninten <- inten.by.chrom$mean.intensity
 
-#   The matrix is 77x6 since there are 77 samples and 6 chromosomes represented
-#   in the dataset
-
+#   The matrix is 77x6 since there are 77 samples and 6 chromosomes represented in the dataset
 dim(mninten)
 head(mninten)
+
 
 #   We also need to calculate the X chromosome and autosome heterozygosities for
 #   each sample before we can plot them
 
 #   Apply hetByScanChrom to genoData (we need actual genotypes to calculate the
 #   heterozygosity)
-
 het.results <- hetByScanChrom(genoData)
-
-#   The function calculates eachs scan's heterozygosity for each chromosome, and
-#   also for the autosomes as a whole
+    #   The function calculates eachs scan's heterozygosity for each chromosome, and
+    #   also for the autosomes as a whole
 
 #   We want to add X and autosome heterozygosity as new columns in scanAnnot
-
 #   Make sure the scanIDs are in the right order first! (they are)
-
 allequal(scanAnnot$scanID, rownames(het.results))
 
 #   Extract the autosomal and X heterozygosity and store them in scanAnnot
-
 scanAnnot$het.A <- het.results[, "A"]
 scanAnnot$het.X <- het.results[, "X"]
 
 #   Add appropriate metadata
+varMetadata(scanAnnot)["het.A", "labelDescription"] <- "fraction of heterozygotes for autosomal SNPs"
+varMetadata(scanAnnot)["het.X", "labelDescription"] <- "fraction of heterozygotes for X chromosome SNPs"
 
-varMetadata(scanAnnot)["het.A", "labelDescription"] <-
-  "fraction of heterozygotes for autosomal SNPs"
-varMetadata(scanAnnot)["het.X", "labelDescription"] <-
-  "fraction of heterozygotes for X chromosome SNPs"
 
-#   Before making the plots, there are a few things to do
+#   Before making the plots, there are a few things to do: We want to color the plotted points by annotated sex
 
-#   We want to color the plotted points by annotated sex
-
-#   But first, make sure that the order of the scanIDs (and hence the annotated
-#   sexes) matches the order of the scanIDs in the data we'll plot
-
+#   But first, make sure that the order of the scanIDs (and hence the annotated sexes) matches the order of the scanIDs in the data we'll plot
 allequal(scanAnnot$scanID, rownames(mninten))
 
-#   Now we assign each sex a color (male=blue, female=red)
-
-#   Store the colors in a vector
-
+#   Now we assign each sex a color (male=blue, female=red) - Store the colors in a vector
 xcol <- rep(NA, nrow(scanAnnot))
 xcol[scanAnnot$sex == "M"] <- "blue"
 xcol[scanAnnot$sex == "F"] <- "red"
 
-#   We also want to count the number of SNPs getting included on the X and Y
-#   chromosomes (which are coded as 23 and 25 in snpAnnot)
-
+#   We also want to count the number of SNPs getting included on the X and Y chromosomes (which are coded as 23 and 25 in snpAnnot)
 nx <- sum(snpAnnot$chromosome == 23)
 ny <- sum(snpAnnot$chromosome == 25)
 
-# Now make the plots
+
+#### Now make the plots - Setup parameters for each plot
 
 # All intensities
-
 x1 <- mninten[, "X"]
 y1 <- mninten[, "Y"]
 main1 <- "Mean X vs \nMean Y Chromosome Intensity"
 
 # Het on X vs X intensity
-
 x2 <- mninten[, "X"]
 y2 <- scanAnnot$het.X
-main2 <-
-  "Mean X Chromosome Intensity vs Mean X Chromosome Heterozygosity"
+main2 <- "Mean X Chromosome Intensity vs Mean X Chromosome Heterozygosity"
 
 # Het on X vs Y intensity
-
 y3 <- mninten[, "Y"]
 x3 <- scanAnnot$het.X
-main3 <-
-  "MeanX Chromosome Heterozygosity vs Mean Y Chromosome Intensity"
+main3 <- "MeanX Chromosome Heterozygosity vs Mean Y Chromosome Intensity"
 
 # X vs A het
-
 x4 <- scanAnnot$het.A[scanAnnot$sex == "F"]
 y4 <- scanAnnot$het.X[scanAnnot$sex == "F"]
-main4 <-
-  "Mean Autosomal Heterozygosity vs Mean X Chromosome Heterozygosity"
+main4 <- "Mean Autosomal Heterozygosity vs Mean X Chromosome Heterozygosity"
+
 
 # Make labels for axes/legends
-
 cols <- c("blue", "red")
 mf <- c("male", "female")
 xintenlab <- paste("X intensity (n=", nx, ")", sep = "")
 yintenlab <- paste("Y intensity (n=", ny, ")", sep = "")
 
-# Make the 4 plots and add a legend
 
+#### Make the 4 plots and add a legend
 par(mfrow = c(2, 2))
 plot(
   x1,
@@ -715,8 +693,7 @@ plot(
   main = main1,
   col = xcol,
   cex.main = 0.8
-)
-legend("bottomleft",
+);legend("bottomleft",
        mf,
        col = cols,
        pch = c(1, 1),
@@ -752,25 +729,202 @@ par(mfrow = c(1, 1))
 
 ```
 
+
 ## Part 2 - Report (Sex Check)
 
-* Describe any anomalies you see in the 4 plots above.
+* (DONE) Describe any anomalies you see in the 4 plots above.
 
-* Figure out the scanIDs of any scans that look like outliers or possible instances of mislabeled sex. Include these IDs in your report and describe why they appear to be mislabeled.
+* (DONE) Figure out the scanIDs of any scans that look like outliers or possible instances of mislabeled sex. Include these IDs in your report and describe why they appear to be mislabeled.
 
-* For the purposes of this assignment we will ASSUME that some scans have just had their sexes mislabeled. (In "real life", we would not just assume this, and we might instead flag these scans for removal from some downstream steps/analyses.)
+* (DONE) For the purposes of this assignment we will ASSUME that some scans have just had their sexes mislabeled. (In "real life", we would not just assume this, and we might instead flag these scans for removal from some downstream steps/analyses.)
 
-* Manually change the sex annotation for these scans in scanAnnot to "remove" the discrepancy. (Manually changing your data is risky and not generally recommended. Be careful!). In your report, state exactly what changes you made. Add a new column to scanAnnot indicating this, too (add appropriate metadata). Does anything in the pedigree structure make you more confident that this "fix" is correct? (Are these samples labeled as mothers or fathers?)
+* (DONE) Manually change the sex annotation for these scans in scanAnnot to "remove" the discrepancy. (Manually changing your data is risky and not generally recommended. Be careful!). 
+    * (DONE) In your report, state exactly what changes you made. Add a new column to scanAnnot indicating this, too (add appropriate metadata). Does anything in the pedigree structure make you more confident that this "fix" is correct? (Are these samples labeled as mothers or fathers?)
 
-* Remake the 4 plots above, using the "corrected" data (nothing should appear mislabeled now for this dataset).
+* (DONE) Remake the 4 plots above, using the "corrected" data (nothing should appear mislabeled now for this dataset).
 
-* How might you follow up on this "in real life"?
+* (DONE) How might you follow up on this "in real life"?
+
+<br>
+
+**Report**:  (side-note:`scanAnnot`, `mninten`)
+
+From the chrY vs chrX intensity plot, we found 2 scans (scanID=325,326) whose reported sex was female, but they showed strong Y intensity but lower X intensity, suggesting a mismatch here and that their inferred sex is male. 
+
+From the chrX het vs chrX intensity plot, we found that in the males cluster, there were reported females (scanID=325,326) showing low X intensity and X het=0, which should be inferred as a male. The scanID matches with plot 1.
+
+From the chrY intensity vs chrX het plot, we found that in the males cluster, there were reported females (scanID=325,326) showing het.x=0 and with high Y intensity, which should be inferred as males. (same information as previous two plots)
+
+From the chrX het vs autosomal het plot, we found outliers & reported females who has 0 chrX heterozygosity (scanID=325,326), which should be inferred as males. Since autosomal heterozygosity should be a spectrum, I am not very worried about the outliers on the x-axis, but to *keep a note the two reported females scanID=338,339*.
+
+- [Conclusion] wrong reported sex: scanID = 325, 326 (should be males)
+
+We further manually corrected the mislabeled sex for scanID=325,326 in the scanAnnot by the code: `pData(scanAnnot)[which( pData(scanAnnot)$scanID %in% c(325, 326) ),]$sex = rep(unique(pData(scanAnnot)$sex)[2], 2)`, which is to change the sex from "F" to "M". We further added a new column `changed_to_QC_inferredSex` (only 325, 326 is TRUE) to scanAnnot, indicating this change. From the pedigree structure of family 1408, the subjectID (200094287) associated with the scanIDs is labeled as **father** of the family, further indicating that our fix should be correct.
+
+After remaking the 4 plots using data with updated sex, there are no more mismatches observed. 
+
+In real life, we would further check the BAF and LRR plots to confirm if the copy number or intensity of the scans' sex chromosomes are expected. Also, we can check on the plate, batch, and other technical information logged in the data to see if there are other possibilities contributing to this mismatch. 
+
 
 ```{r part2_report_sex_check}
+# Plot 1
+ls_plt1_reportedSex = 
+    pData(scanAnnot) %>%
+    select(scanID, sex) %>%
+    filter(sex=="F") %>% #find those reported as females
+    pull(scanID)
 
-#   <Your code goes here>
+ls_plt1_reportedSex[
+    #find those inferred as males -> find the overlap
+    ls_plt1_reportedSex %in% rownames(mninten)[mninten[,"Y"] > 0.5] 
+]
+
+# Plot 2
+pData(scanAnnot) %>%
+    select(scanID, sex, het.X) %>%
+    filter(sex=="F" & het.X < 0.15) %>% #find those reported as females && low het.x
+    pull(scanID)
+
+c(325,326) %in% rownames(mninten)[mninten[,"X"]<0.9] #confirmed
+
+# Plot 3 - same info as before
+c(325,326) %in% rownames(mninten)[mninten[,"Y"] > 0.5]
+
+# Plot 4 - same info as before
+pData(scanAnnot) %>%
+    select(scanID, sex, het.A) %>%
+    filter(sex=="F" & het.A < 0.282) %>% #find those reported as females && low het.A
+    pull(scanID)
+```
+
+
+Manually change the mislabeled sex
+
+```{r}
+# 1. Update sex
+pData(scanAnnot)[which( pData(scanAnnot)$scanID %in% c(325, 326) ),]$sex =
+    rep(unique(pData(scanAnnot)$sex)[2], 2)
+## check
+pData(scanAnnot)[which( pData(scanAnnot)$scanID %in% c(325, 326) ),]$sex
+
+
+# 2. Add a new column to indicate the change
+pData(scanAnnot) = 
+    pData(scanAnnot) %>%
+    mutate(changed_to_QC_inferredSex = 
+               if_else(condition=scanID %in% c(325, 326), 
+                       true=TRUE, false=FALSE) 
+           ) #%>% filter(changed_to_QC_inferredSex)
+## checks
+pData(scanAnnot) %>% filter(changed_to_QC_inferredSex)
+
+
+# 3. Modify the metaData
+varMetadata(scanAnnot)["changed_to_QC_inferredSex","labelDescription"] = 
+    "Logical vector; TRUE if we manually changed the scanID's `sex` to the opposite, based on the results of QC step 'Reported Sex vs Inferred Sex' "
+## checks
+varMetadata(scanAnnot) %>% tail(n=2)
+getVariableNames(scanAnnot)
+
+
+# 4. check pedigree
+pData(scanAnnot) %>% filter(family==1408)
 
 ```
+
+Remake the 4 plots above, using the "corrected" data 
+
+```{r}
+allequal(scanAnnot$scanID, rownames(mninten))
+
+# Reassign sex
+xcol <- rep(NA, nrow(scanAnnot))
+xcol[scanAnnot$sex == "M"] <- "blue"
+xcol[scanAnnot$sex == "F"] <- "red"
+
+#   We also want to count the number of SNPs getting included on the X and Y chromosomes (which are coded as 23 and 25 in snpAnnot)
+nx <- sum(snpAnnot$chromosome == 23)
+ny <- sum(snpAnnot$chromosome == 25)
+
+
+#### Now make the plots - Setup parameters for each plot
+
+# All intensities
+x1 <- mninten[, "X"]
+y1 <- mninten[, "Y"]
+main1 <- "[updated] Mean X vs \nMean Y Chromosome Intensity"
+
+# Het on X vs X intensity
+x2 <- mninten[, "X"]
+y2 <- scanAnnot$het.X
+main2 <- "[updated] Mean X Chromosome Intensity vs Mean X Chromosome Heterozygosity"
+
+# Het on X vs Y intensity
+y3 <- mninten[, "Y"]
+x3 <- scanAnnot$het.X
+main3 <- "[updated] MeanX Chromosome Heterozygosity vs Mean Y Chromosome Intensity"
+
+# X vs A het
+x4 <- scanAnnot$het.A[scanAnnot$sex == "F"]
+y4 <- scanAnnot$het.X[scanAnnot$sex == "F"]
+main4 <- "[updated] Mean Autosomal Heterozygosity vs Mean X Chromosome Heterozygosity"
+
+
+# Make labels for axes/legends
+cols <- c("blue", "red")
+mf <- c("male", "female")
+xintenlab <- paste("X intensity (n=", nx, ")", sep = "")
+yintenlab <- paste("Y intensity (n=", ny, ")", sep = "")
+
+
+#### Make the 4 plots and add a legend
+par(mfrow = c(2, 2))
+plot(
+  x1,
+  y1,
+  xlab = xintenlab,
+  ylab = yintenlab,
+  main = main1,
+  col = xcol,
+  cex.main = 0.8
+);legend("bottomleft",
+       mf,
+       col = cols,
+       pch = c(1, 1),
+       cex = 0.5)
+plot(
+  x2,
+  y2,
+  col = xcol,
+  xlab = xintenlab,
+  ylab = "X heterozygosity",
+  main = main2,
+  cex.main = 0.8
+)
+plot(
+  x3,
+  y3,
+  col = xcol,
+  ylab = yintenlab,
+  xlab = "X heterozygosity",
+  main = main3,
+  cex.main = 0.8
+)
+plot(
+  x4,
+  y4,
+  col = "red",
+  xlab = "Autosomal heterozygosity",
+  ylab = "X heterozygosity",
+  main = main4,
+  cex.main = 0.8
+)
+par(mfrow = c(1, 1))
+```
+
+<hr>
+
+<br>
 
 ## Part 3 - Allelic Imbalance; BAF and LRR Plots
 
