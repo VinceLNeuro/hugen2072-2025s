@@ -10,4 +10,5 @@ Step 1.4. criteria: (given snp missing.n2 < 5%) Sample-missing rate >= 0.05 -> *
 **wrong reported sex**: 325, 326 (should be male)
 - Solution: manually changed to sex="M" && added another variable `changed_to_QC_inferredSex` (only 325, 326 is TRUE) to indicate the modification
     
---- ---
+---Step 3. BAF & LRR plots---
+

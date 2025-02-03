@@ -22,8 +22,9 @@
     GenotypeData(gds_geno, snpAnnot = snpAnnot, scanAnnot = scanAnnot)
     ```
 
+<br>
 
-## 3. {GWASTools} QC Step 1: Missingness
+## {GWASTools} QC Step 1: Missingness
 
 ```r
 missingGenotypeBySnpSex(genoData, #GenotypeData object
@@ -53,12 +54,12 @@ missingGenotypeByScanChrom(GenotypeData,
 
   3. `missing.fraction`: A vector, containing the **missingness for each scan** over all chromosomes, excluding the Y chromosome for females.
 
+<br>
 
-## 4. {GWASTools} QC Step 2: Reported Sex vs Inferred Sex (possibly sex-chromosome aneuploidy)
+## {GWASTools} QC Step 2: Reported Sex vs Inferred Sex (possibly sex-chromosome aneuploidy)
 
 **Data Type** to work on: IntensityData (`qxyData`)
     
-
 ```r
 meanIntensityByScanChrom(intenData, #IntensityData object
                         vars = c("X", "Y"), #char-vector for intensity variables names
@@ -78,8 +79,15 @@ hetByScanChrom(genoData, snp.exclude = NULL, verbose = TRUE)
 ``` 
 - Output: matrix (row=scan, col=chr), containing <u>chromosomes heterozygosity rates</u>, including a column **"A" for all autosomes**.
 
-  
-  
-  
-  
+<br>
 
+## {GWASTools} QC Step 3: B allele frequency (BAF) and log R ratio (LRR) plots
+
+`chromIntensityPlot()`
+* [NOTE] Check the manual for more information
+
+* e.g., *chromosome 22 was flagged for scanID 286.*
+    ```r
+    chromIntensityPlot(intenData = blData, #IntensityData
+                       scan.ids = 286, chrom.ids = 22)
+    ```

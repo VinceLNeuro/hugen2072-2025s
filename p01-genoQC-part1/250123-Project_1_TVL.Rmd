@@ -223,7 +223,7 @@ Q7: Chromosomes included in this study:
 chromosome  number_of_SNPs
 21	        1000			
 22	        1000			
-23(X)	      1000			
+23(X)	    1000			
 24(Y)       100			
 25(XY)      100			
 26(MT)      100	
@@ -928,19 +928,17 @@ par(mfrow = c(1, 1))
 
 ## Part 3 - Allelic Imbalance; BAF and LRR Plots
 
-Here we want to look at B allele frequency (BAF) and log R ratio (LRR) plots using `chromIntensityPlot()`. Ordinarily, since there are 22 to 23 chromosomes to check for every sample, you would use a script that automatically detects aberrations in BAF and LRR. For this project, we'll pretend that our pipeline has already flagged one sample for a possible chromosomal anomaly.
+Here we want to look at B allele frequency (BAF) and log R ratio (LRR) plots using `chromIntensityPlot()`. Ordinarily, since there are 22 to 23 chromosomes to check for every sample, you would use a script that automatically detects aberrations in BAF and LRR. For this project, we'll pretend that our pipeline has already **flagged one sample for a possible chromosomal anomaly**.
 
 ```{r baflrr, eval=TRUE}
 
 # Recall that earlier we read the intensity data into an IntensityData object
 # called blData.
-
-# The snp/scan annotation were attached as well.
+class(blData) # The snp/scan annotation were attached as well.
 
 # Suppose that chromosome 22 was flagged for scanID 286.
 
 # Making the BAF/LRR plot is easy
-
 #dev.off()
 chromIntensityPlot(blData, scan.ids = 286, chrom.ids = 22)
 par(mfrow = c(1, 1))
@@ -949,20 +947,43 @@ par(mfrow = c(1, 1))
 
 ## Part 3 - Report
 
-* Describe the purpose of this step.
+* (DONE) Describe the purpose of this step.
 
-* Show an example of a "normal" pair of BAF/LRR plots (choose any chromosome/scanID you want).
+* (DONE) Show an example of a "normal" pair of BAF/LRR plots (choose any chromosome/scanID you want).
 
-* How would you detect trisomy 21 (i.e., describe briefly in words what the BAF/LRR plot would look like).
+* (DONE) How would you detect trisomy 21 (i.e., describe briefly in words what the BAF/LRR plot would look like).
 
-* Suppose an individual had a balanced reciprocal translocation involving chromosome 2 and 4. What would you expect that individual's BAF/LRR plots would look like for those chromosomes?
+* (DONE) Suppose an individual had a balanced reciprocal translocation involving chromosome 2 and 4. What would you expect that individual's BAF/LRR plots would look like for those chromosomes?
 
-* Suppose chromosome 22 in sample 286 was the only chromosome flagged for a possible anomaly in this dataset. Looking at the plot, do you notice anything strange? Can you suggest what kind of anomaly might be showing up? (There isn't any single answer that's certainly right! The purpose of this question is to check that you understand what the BAF and LRR plots "mean").
+* (DONE) Suppose chromosome 22 in sample 286 was the only chromosome flagged for a possible anomaly in this dataset. Looking at the plot, do you notice anything strange? Can you suggest what kind of anomaly might be showing up? (There isn't any single answer that's certainly right! The purpose of this question is to check that you understand what the BAF and LRR plots "mean").
 
-* Finally, suppose your pipeline has given you a list of the exact chromosomal segments showing possibly aneuploidies/anomalies in each sample. What would you recommend doing with the genotypes in those segments? (You're not being asked to implement this here - just say what you recommend doing.)
+* (DONE) Finally, suppose your pipeline has given you a list of the exact chromosomal segments showing possibly aneuploidies/anomalies in each sample. What would you recommend doing with the genotypes in those segments? (You're not being asked to implement this here - just say what you recommend doing.)
+
+<br>
+
+**Report**: 
+
+* The purpose of this step is to assess allelic imbalance: using BAF plot to check the genotype information, aneuploidy, and mosaicism based on the number of bands, and using LRR plot to check the copy number or intensity for this region of the chromosome and for this scan. 
+
+* I created a "normal" pair of BAF/LRR plots for scan 312, chromosome 21 (may have a little bit loss of heterozygosity)
+
+* To detect trisomy 21, we expected that the LRR will be higher than 0 (at 0.5) for the entire chromosome 21 indicating copy number = 3, and that the BAF will show 4 bands at 0, 0.33, 0.66, 1, instead of 3 bands observed in disomy.
+
+* Given that a balanced reciprocal translocation happened, indicating just an (structural) exchange of chromosomal location without genetic content loss or increase (i.e., the copy number should not change), and without big changes in genotype (still AA, AB, BB), the BAF/LRR plots of this individual would be like *normal* for those two chromosomal regions--mean LRR being 0, and 3 bands in BAF plot.
+
+* Looking at the plot, I can see 1) loss of heterozygosity (LOH) at 26-27Mb & 37Mb, and 2) there are something wrong at 21-22Mb, possibly contamination since there is nothing shown in the LRR but there are a couple signals in the BAF plot.
+
+* I would check those segments manually, and remove the segments (i.e., setting those segments as not being called) in all samples if most of the samples reported this problem. For other segments that are sample-specific, we can remove the specific regions only in those samples. For all the removal, keep a record of the regions and a copy of the original data for recovery purpose. Of course, this would involve a group's discussion.
+
 
 ```{r part3_report}
-
-#  <Your code goes here>
+# Show an example of a "normal" pair of BAF/LRR plots
+chromIntensityPlot(blData, scan.ids = 312, chrom.ids = 21)
+par(mfrow = c(1, 1))
 
 ```
+
+```{r}
+sessionInfo()
+```
+
