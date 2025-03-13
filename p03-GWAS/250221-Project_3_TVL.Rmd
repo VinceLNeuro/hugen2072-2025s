@@ -11,8 +11,6 @@ output:
     df_print: paged
     number_sections: no
     theme: cosmo
-editor_options:
-    chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}
@@ -49,6 +47,8 @@ In each part of this project you will implement one of the main steps of GWAS (s
 
 **It is expected that you will copy this file somewhere to your directory on the CRC cluster so that you can use the RStudio Server, where all the packages you need have been installed already.**
 
+<br>
+
 ## Part 0 - Setup Workspace and Load Sample Data
 
 First, load the packages we'll be using.
@@ -71,10 +71,10 @@ showfile.gds(closeall = T, verbose = T)
 ```
 
 
-All of the files you will need are located on the cluster in `/ix1/hugen2072_2025s/p3/`.
+All of the files you will need are located on the cluster in `/ix1/hugen2072-2025s/p3/`.
 
 ```
-p3_sample_info.RData
+p3_sample_info.RData        #ScanAnnotationDataFrame
 p3_variant_info.RData
 p3_pca.RData
 p3_grm.RData
@@ -86,11 +86,11 @@ To start, load in the sample information file and examine it.
 ```{r part0_sample}
 
 # path to folder for project
-#my_folder <- "/ix1/hugen2072-2025s/p3/"
-my_folder <- "/bgfs/jcarlson/hugen2072/project3_GWAS/files_for_students/"
+my_folder <- "/ix1/hugen2072-2025s/p3/"
+# my_folder <- "/bgfs/jcarlson/hugen2072/project3_GWAS/files_for_students/"
 
 # load the sample info file
-load(paste0(my_folder, "p3_sample_info.RData"), verbose = TRUE)
+load(paste0(my_folder,"p3_sample_info.RData"), verbose = TRUE)
 
 # what type of data file is sample.info
 class(sample.info)
@@ -110,9 +110,49 @@ Describe the distribution of the phenotype height. Does it vary by sex or popula
 Based on your findings, do you think you should include sex or pop as covariates in a GWAS for height?  
 
 
+**Report**
+
+1. In this study, we have 2548 samples with information about "scanID", "sex", "pop" (population), "height".
+
+2. The distribution of height is nearly normally distributed. When stratifying by sex, we can see males has greater median heights than females. When stratifying by population substructure, we can see a **roughly** ranked median heights: AFR > EAS > SAS > AMR > EUR (as well as a small porportion of samples with population `EUR,AFR`).
+
+3. Based on the EDA, it is clear that `sex` and `pop` are associated with heights. They might also affect genetic info (especially population structure), so we should adjust for them in the GWAS. 
+
 ```{r part0_report}
 
 # Your code goes here
+
+## check sample size (unique)
+pData(sample.info) %>% nrow()
+pData(sample.info) %>% distinct() %>% nrow()
+
+## check variables
+colnames( pData(sample.info) )
+
+## Distribution of height
+pData(sample.info) %>% 
+    ggplot(aes(x = height)) + 
+    geom_histogram(color="black")
+
+pData(sample.info) %>% 
+    ggplot(aes(x = height, fill=sex)) + 
+    geom_histogram(color="black") + 
+    labs(title = "Height by sex") + 
+    facet_grid(rows = vars(sex))
+
+pData(sample.info) %>% 
+    ggplot(aes(x = height, fill=pop)) + 
+    geom_histogram(color="black") + 
+    labs(title = "Height by population", fill="population") + 
+    facet_grid(rows = vars(pop))
+# check the median heights, which can be hard to tell from histograms
+pData(sample.info) %>% 
+    group_by(pop) %>%
+    summarize(median_heights = median(height)) %>%
+    arrange(desc(median_heights)) %>%
+    slice(-1) #%>%
+    # pull(pop) %>%
+    # paste(., collapse = " > ")
 
 ```
 
@@ -127,23 +167,25 @@ Load in the SNP information file and explore it. The columns are:
 - chr: chromosome  
 - pos: position  
 - alleles: allele codes (ref, alt)  
-- af: alt allele frequency  
-- r2: imputation r-squared  
+- **af: alt allele frequency  **
+- **r2: imputation r-squared  **
 - genotyped: TRUE if genotyped, FALSE if imputed
 
 ```{r part1_geno}
 
 # load in SNP information file
-load(paste0(my_folder, "p3_variant_info.RData"), verbose = TRUE)
+load(paste0(my_folder,"p3_variant_info.RData"), verbose = TRUE)
+head(snp.info)
+nrow(snp.info)
 
 # counts of imputed vs. genotyped variants
 snp.info %>% count(genotyped)
 
 # explore imputation quality r2
 ggplot(data = snp.info, aes(x=r2)) + 
-  geom_histogram() 
+  geom_histogram(color="black") 
 
-# explore allele frequency
+# explore alt allele frequency - some > 0.5 (not all minor alleles)
 ggplot(data = snp.info, aes(x=af)) + 
   geom_histogram()
 
@@ -159,7 +201,10 @@ Create a list of SNPs to use for downstream analyses, implementing your chosen f
 ```{r part1_snp_filter}
 
 # make list of snp.ids for SNPs passing filters using snp.info 
-snps.keep <- snp.info %>% filter() %>% pull(snp.id)
+snps.keep <- 
+    snp.info %>% filter( (r2 > 0.3) & (af > 0.05 & af < 0.95) ) %>% pull(snp.id)
+
+length(snps.keep)
 
 ```
 
@@ -168,19 +213,52 @@ snps.keep <- snp.info %>% filter() %>% pull(snp.id)
 
 How many variants are present in the imputed genotypes GDS file? 
 
+1. 647,629 variants in total
+
+
 How many variants are imputed and how many are genotyped?
+
+2. 10,009 genotyped, 637,620 imputed variants
+
 
 Make a plot showing the distribution of imputation quality (r2). What do you think is a reasonable threshold to set for keeping SNPs based on this?
 
+3. We lack leave-one-out statistics to help determine the threshold. However, from the histogram, we can see that the amount of low-quality imputed variants stop to drop at around **r2 = 0.3**, so this could be a reasonable threshold while retaining more reasonably high-quality variants.
+
+
 Make a plot showing the distribution of allele frequencies. What do you think is a reasonable threshold to set for keeping SNPs based on this?
+
+4. Based on the histogram, minor allele freq > 5% (i.e., alt allele freq >5% & <95%) would be a good threshold (stop decreasing much).
+
 
 How many variants are you going to include in your analyses (those that have high imputation quality and are common enough to include in a GWAS)?
 
+5. **58,513 variants** after filtering to be included in a GWAS
 
 ```{r part1_report}
 
 # Your code goes here
+nrow(snp.info)
 
+# imputation R2 threshold
+snp.info %>% 
+    filter(r2 > 0.8) %>%
+    nrow()
+snp.info %>% 
+    filter(r2 > 0.3) %>%
+    nrow()
+ggplot(data = snp.info, aes(x=r2)) + 
+    geom_histogram(color="black") + 
+    geom_vline(xintercept = c(0.3, 0.8), color = c("red", "blue"))
+
+
+# alt allele frequency threshold
+ggplot(data = snp.info, aes(x=af)) + 
+    geom_histogram(color="black", binwidth = 0.01) + 
+    geom_vline(xintercept = 0.05, color = c("red"))
+
+snp.info %>% filter(af > 0.05) %>% nrow()
+snp.info %>% filter(af > 0.05 & af < 0.95) %>% nrow()
 ```
 
 ## Part 2 - Principle Components of Ancestry
@@ -193,30 +271,37 @@ Merge this with the sample.info information and create plots of the PCAs. **You 
 ```{r part2_pca}
 
 # load PCA object
-load(paste0(my_folder, "p3_pca.RData"), verbose = TRUE)
+load(paste0(my_folder,"p3_pca.RData"), verbose = TRUE)
 
-# make scree plot
+attributes(mypcair) #`values`: eigenvalues = variance for each PCs
+pca #PCs
+
+#1. make scree plot (variance)
 dat <- data.frame(pc=1:32, varprop=mypcair$varprop[1:32])
-ggplot(dat, aes(x=factor(pc), y=100*varprop)) +
-  geom_point() + theme_bw() +
+ggplot(dat, aes(x=factor(pc), y=100*varprop, group=1)) +
+  geom_point() + geom_line() + theme_bw() +
   xlab("PC") + ylab("Percent of variance accounted for")
 
-# make exploratory plots
+
+#2. make exploratory plots 
+##  "." for unrelated subset
 plot(mypcair) # PC1 and PC2
 plot(mypcair, vx = 3, vy =  4) # PC3 and PC4
+
 
 # merge with sample.info to get pop code 
 pca <- left_join(pca, pData(sample.info), by="scanID")
 
-# make parallel coordinates plot colored by pop code
+#3. make parallel coordinates plot colored by pop code
 ggparcoord(pca, columns=1:15, groupColumn="pop", alphaLines=0.5, scale="uniminmax") +
     guides(colour=guide_legend(override.aes=list(alpha=1, size=2))) +
     theme_bw() + xlab("PC") + ylab("")
 
-# decide how many PCAs to include in the GWAS 
+
+#4. decide how many PCAs to include in the GWAS 
 # add the PCA values to the scan annotation file to include them in the GWAS
 # (change 32 to your selected number)
-sample.info.pcs <- pca %>% select(scanID, sex, pop, height, PC1:PC32)
+sample.info.pcs <- pca %>% select(scanID, sex, pop, height, PC1:PC10)
 sample.info.pcs <- ScanAnnotationDataFrame(sample.info.pcs)
 sample.info.pcs
 
@@ -227,10 +312,59 @@ sample.info.pcs
 
 How many principal components of ancestry will you include as covariates in the GWAS? Why did you choose this number?
 
+Answer: 
+
+* From the PC scree plot, the final largest drop is at PC4 -> PC5, which informs the selection of the first 5 PCs.
+
+* However, from pairwise PC plot (first 8 PCs), we can see that first 4 PCs are clearly explaining cross-ancestry variances, while PC5, 6, 8 are explaining variances within the AFR population and PC7 is explaining that within the EAS population. It is noteworthy that PC6 vs PC8 seems separating AFR population into 7 subpopulations. Thus, it seems reasonable to include the first 8 PCs.
+
+* Further from the Parellel Coordinate Plot, we can see that PC9 is further separating EUR population from others, and PC10 seems another PC explaining AFR sub population structure. There is no interesting things happen after PC10. 
+
+<mark>Thus, we decided to include the first 10 PCs</mark>
+
 
 ```{r part2_report}
 
 # Your code goes here
+
+## after combining with ancestry information
+pca
+
+
+## choose the first 8 PCs to plot pairwise PC plot
+# date = format(Sys.time(), "%Y%m%d")
+# filename = paste0("p03-GWAS/PCs_",date,".pdf")
+# pdf(filename, width = 5, height = 5)
+
+pc_pairs = data.frame("pair1"=rep(NA, choose(8,2)), # combination, 8 choose 2
+                      "pair2"=NA) 
+row=1
+for (i in seq(1:8)){
+    for (j in seq(1:8)){
+        if (i<j){
+            pc_pairs[row,"pair1"] = paste0("PC",i)
+            pc_pairs[row,"pair2"] = paste0("PC",j)
+            row = row +1
+        }
+    }
+}
+print(pc_pairs) #ready for plotting
+
+# loop through the target and make a plot
+for (i in seq(nrow(pc_pairs))){
+    pc_x = pc_pairs[i,"pair1"] #x axis
+    pc_y = pc_pairs[i,"pair2"] #y axis
+    canvas = pca %>% 
+        ggplot(aes(x=.data[[ pc_x ]],
+                   y=.data[[ pc_y ]],
+                   col = pop)) +
+        geom_point(size=3, alpha=0.6) + #add in color by race here
+        theme_bw() + 
+        labs(title = paste0(pc_y," vs ",pc_x))
+    print(canvas)
+}
+
+# dev.off()
 
 ```
 
