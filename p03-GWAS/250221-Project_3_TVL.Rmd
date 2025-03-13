@@ -379,11 +379,32 @@ Create a kinship plot to examine relatedness among the sample.
 ```{r part3_relatedness}
 
 # Load in pc-relate results
-load(paste0(my_folder, "p3_grm.RData"), verbose = TRUE)
+load(paste0(my_folder,"p3_grm.RData"), verbose = TRUE)
+## mypcrelate
+## GRM
 
 # Make kinship plot
-plot(mypcrelate$kinBtwn$k0, mypcrelate$kinBtwn$kin, xlab="k0", ylab="kinship")
+# filename = paste0("p03-GWAS/kinship_plot_",date,".png")
+# png(filename, width = 6, height = 6, units = 'in', res = 500)
 
+cut.dup <- 1 / (2 ^ (3 / 2))
+print(cut.dup)
+
+cut.deg1 <- 1 / (2 ^ (5 / 2))
+print(cut.deg1)
+cut.deg2 <- 1 / (2 ^ (7 / 2))
+cut.deg3 <- 1 / (2 ^ (9 / 2))
+
+plot(mypcrelate$kinBtwn$k0, #kinBtwn	A data.frame of estimated pairwise kinship coefficients and IBD sharing probabilities (if ibd.probs is TRUE).
+     mypcrelate$kinBtwn$kin, 
+     xlab="k0", ylab="kinship")
+abline(
+  h = c(cut.deg1, cut.deg2, cut.deg3, cut.dup), # the top line in the graph is cut.deg1 (NOT dup!)
+  lty = 2,
+  col = "gray"
+)
+
+# dev.off()
 ```
 
 Decide on a null model to use for a GWAS of height for this sample. You will be guided to think about specific aspects for these filters in the reporting section below. 
@@ -395,6 +416,13 @@ Run the null model in the chunk below. **You will need to supply the code for ru
 
 # run the null model here (write code to do so)
 
+nullMod_lmer = fitNullModel(x = sample.info.pcs,
+                            outcome = "height",
+                            covars = c("sex", paste0("PC",1:10)), 
+                            cov.mat = GRM, # varCov structure of LMM (A, GRM)
+                            family = "gaussian", # LMM
+                            sample.id = NULL, # IDs for samples to include (all)
+                            two.stage = FALSE) # NO rank-based INT of residuals
 
 ```
 
@@ -402,16 +430,35 @@ Run the null model in the chunk below. **You will need to supply the code for ru
 
 Do you think you should account for relatedness with a genetic relatedness matrix?  
 
+1. **Yes, we should account for relatedness using GRM as random effects** because it is clear from the kinship plot that we have majority of unrelated and 3rd degree, but we also have data clouds of parent offspring (kinship=0.25, k0=0), full-siblings (kinship=0.25, k0=0.25), and a few 2nd degree relatives. 
+
 What type of model should be used for a GWAS of height (linear or logistic)? 
+
+2. Height is a continuous variable, so a **linear mixed-effects model**
 
 Does the height phenotype appear to follow a normal distribution closely enough, or do you think we should use an inverse normal transformed phenotype here? Explain. 
 
+3. Yes, it follows normal distribution (a bit light tailed). We should NOT use inverse normal transformation.
+
 What covariates are included in the null model? (Hint: think back to your findings in part 0 and part 2.)
 
+4. **Null Model:**
+
+$$
+\text{height}_{ij} \sim \beta_0 + \beta_1 \text{sex}_{ij} + X_{\text{first 10 PCs}} \gamma + Wu_{j} + \epsilon_{ij}
+$$
+
+* `sex`, population structure (first 10 PCs), random effects/intercept (GRM)
 
 ```{r part3_report}
 
 # Your code goes here
+
+# check distribution of height
+pData(sample.info.pcs) %>%
+    ggplot(aes(sample = height)) + 
+    geom_qq() + geom_qq_line(color="red") + 
+    labs(title="QQ plot checking normality for height (a bit light tailed, but mostly normal!)")
 
 ```
 
@@ -421,7 +468,7 @@ What covariates are included in the null model? (Hint: think back to your findin
 Now, you will finally run the genotype association tests for the GWAS. The imputed genotypes are available as a SNP GDS file, `p3_imputed_data.gds`. Using this and the null model you created in Part 3, run the single variant association tests genome-wide using an additive genetic model. **You will need to EDIT code to achieve this and turn `eval=TRUE` in this chunk. To get this to run in RStudio make sure you leave the BPPARAM option as `BPPARAM=BiocParallel::SerialParam()`.**    
 
 
-```{r part4_assoc, eval=FALSE}
+```{r part4_assoc, eval=TRUE}
 
 # read in GDS file
 gdsfile <- paste0(my_folder, "p3_imputed_data.gds")
@@ -433,14 +480,20 @@ genoData
 
 # create the genotype block iterator
 iterator <- GenotypeBlockIterator(genoData, snpBlock=5000, snpInclude=snps.keep)
+# length(snps.keep) #MAF & R2 threshold
 
 # run association test 
 #  REPLACE your_null_model WITH YOUR NULL MODEL OBJECT FROM PART 3
 assoc <- assocTestSingle(iterator, 
-                         null.model = your_null_model,
+                         null.model = nullMod_lmer,
+                         geno.coding = "additive",
                          BPPARAM=BiocParallel::SerialParam())
 
-
+head(assoc)
+# freq: effect allele freq
+# Est : beta approximation
+# PVE : single-var SNP-based heritability approximation
+nrow(assoc)
 ```
 
 
@@ -456,7 +509,88 @@ Which variant is the most significantly associated with height? What is the effe
 
 # Your code goes here
 
+# Produce unique variant ID
+assoc = assoc %>%
+    mutate(uniq.var.id = paste0(chr,":",pos,"_",variant.id) ) %>%
+    relocate(uniq.var.id, .before = variant.id)
+# convert chr to numeric
+assoc$chr = as.numeric(assoc$chr)
+str(assoc)
+
+
+library(fastman) # I prefer using this package, which is fast and clear for finding top indep.sig.SNPs for validation purpose.
+
+#### Manhattan Plot ####
+# png( paste0("p03-GWAS/manhattan_",date,".png"),
+#     width=10, height=6, units="in", res=300)
+fastman(m = assoc, chr="chr", bp="pos", p="Score.pval", snp = "uniq.var.id",
+        # suggestiveline = -log10(5e-6), 
+        genomewideline = -log10(5e-8),
+        annotationWinMb = 0.5,
+        annotateTop = TRUE,
+        # annotatePval = 5e-6,
+        annotatePval = 1e-5,
+        colAbovePval = TRUE,
+        # axis size (default=0.6), point size (0.4), label size (0.4)
+        cex.axis = 0.8, cex = 0.6, cex.text = 0.6,
+        
+        annotationAngle=20, #for including a title
+        main = "GWAS of height (suggestive-threshold = 1e-5)")
+# dev.off()
+
+## Examine the results further
+assoc %>% filter(Score.pval < 5e-8)
+
+
+## Which variant is the most significantly associated with height? 
+## What is the effect size estimate from the model for this variant? 
+assoc %>% arrange(Score.pval) %>% slice(1) 
+    # 19:28492903; Est/beta approx = -0.885; single-variant SNP-based heritability approximation = 0.00838359 (0.84%)
+
+
+## calculate total SNP-based heritability
+varCompCI(null.model = nullMod_lmer, 
+          prop = TRUE)
+    # V_A = 0.2267407 (= 22.67%)
+
+
+#### QQ plot & lambda_GC ####
+## sort p-values
+assoc_p = assoc %>%
+  arrange(Score.pval) %>%
+  pull(Score.pval)
+range(assoc_p)
+
+# png( paste0("p03-GWAS/QQplot_",date,".png"),
+#     width = 6, height = 6, units = "in", res = 300)
+fastqq(assoc_p) ## plot using "fastman"
+    # 1.012322
+# dev.off()
+
+## verifying the calculation of lambda, by hand
+lambda = qchisq(median(assoc_p, na.rm = TRUE), df=1, lower.tail = FALSE) / 
+    qchisq(0.5, df=1, lower.tail = FALSE)
+### additive coding of SNP (df=1)
+### lower.tail = FALSE: because p-value corresponds to the upper-tail cumulative P = P(X>x)
+cat(paste0("lambda = ",round(lambda,5),"\n"))
 
 ```
 
+**Report**
+
+The QQ plot and the manhattan plot for GWAS were plotted. $\lambda_{GC}$ is calculated to be `r lambda`, which is below 1.1 meaning that there is no significant genomic inflation. 
+
+There is **no genome-wide significant locus** from this study (should be very underpowered for the phenotype height). 
+
+"19:28492903" is the most signficant variant associated with height. The effect size approximation (Est/beta approx) is -0.885, meaning that for 1 additional copy of the effect allele, height of the sample would be decrease by -0.885 unit. Its single-variant SNP-based heritability approximation is 0.00838359 (0.84%).
+
+This is an underpowered study (for phenotype like height), while we obtained a SNP-based heritability (h2_g) of 22.67%.
+
+
+
+```{r}
+showfile.gds(closeall = T, verbose = T)
+
+sessionInfo()
+```
 

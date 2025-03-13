@@ -2,7 +2,7 @@
 
 ## 0. Data Description
 
-### Sample data
+### 0.1. Sample data
 
 * N = 2548
 * median heights: 
@@ -18,7 +18,7 @@
     ```
 Based on the EDA, it is clear that `sex` and `pop` are associated with heights. They might also affect genetic info (especially population structure), so we should adjust for them in the GWAS. 
 
-### Genotype Data (Post-imputation)
+### 0.2. Genotype Data (Post-imputation)
 
 * From TOPMed -> downsampled
 
@@ -42,7 +42,6 @@ Based on the EDA, it is clear that `sex` and `pop` are associated with heights. 
     length(snps.keep) #58513 SNPS
     ```
 
-<br>
 
 ## 1. PCA
 
@@ -56,4 +55,80 @@ Based on the EDA, it is clear that `sex` and `pop` are associated with heights. 
 <mark>Thus, we decided to include the first 10 PCs</mark>
 
 
+## 2. Kinship (`PC-Relate`)
 
+Kinship Plot (top line is `cut.deg1` (NOT dup!))
+
+<img src="kinship_plot_20250313.png" width=700>
+
+Interpretation: **we should account for relatedness using GRM as random effects** because it is clear from the kinship plot that we have majority of unrelated and 3rd degree, but we also have data clouds of parent offspring (kinship=0.25, k0=0), full-siblings (kinship=0.25, k0=0.25), and a few 2nd degree relatives. 
+
+<br>
+
+## 3. Null Model
+
+$$
+\text{height}_{ij} \sim \beta_0 + \beta_1 \text{sex}_{ij} + X_{\text{first 10 PCs}} \gamma + Wu_{j} + \epsilon_{ij}
+$$
+
+* `sex`, population structure (first 10 PCs), random effects/intercept (GRM)
+
+```r
+
+nullMod_lmer = fitNullModel(x = sample.info.pcs,
+                            outcome = "height",
+                            covars = c("sex", paste0("PC",1:10)), 
+                            cov.mat = GRM, # varCov structure of LMM (A, GRM)
+                            family = "gaussian", # LMM
+                            sample.id = NULL, # IDs for samples to include (all)
+                            two.stage = FALSE) # NO rank-baed INT of residuals
+
+```
+
+## 4. Two-step Adjustment Association Test
+
+```r
+# read in GDS file
+gdsfile <- paste0(my_folder, "p3_imputed_data.gds")
+
+# create genotype data object
+geno <- GdsGenotypeReader(filename = gdsfile)
+genoData <- GenotypeData(geno)
+genoData
+
+# create the genotype block iterator
+iterator <- GenotypeBlockIterator(genoData, snpBlock=5000, snpInclude=snps.keep)
+# length(snps.keep) #MAF & R2 threshold
+
+# run association test 
+#  REPLACE your_null_model WITH YOUR NULL MODEL OBJECT FROM PART 3
+assoc <- assocTestSingle(iterator, 
+                         null.model = nullMod_lmer,
+                         geno.coding = "additive",
+                         BPPARAM=BiocParallel::SerialParam())
+
+head(assoc)
+# freq: effect allele freq
+# Est : beta approximation
+# PVE : single-var SNP-based heritability approximation
+```
+
+
+## GWAS Report
+
+The QQ plot and the manhattan plot for GWAS were plotted. $\lambda_{GC}$ is calculated to be 1.01232, which is below 1.1 meaning that there is no significant genomic inflation. 
+
+There is **no genome-wide significant locus** from this study (should be very underpowered for the phenotype height). 
+
+"19:28492903" is the most signficant variant associated with height. The effect size approximation (Est/beta approx) is -0.885, meaning that for 1 additional copy of the effect allele, height of the sample would be decrease by -0.885 unit. Its single-variant SNP-based heritability approximation is 0.00838359 (0.84%).
+
+This is an underpowered study (for phenotype like height), while we obtained a SNP-based heritability (h2_g) of 22.67%.
+
+```r
+varCompCI(null.model = nullMod_lmer, prop = TRUE)
+# V_A = 0.2267407 (= 22.67%)
+```
+
+<img src="manhattan_20250313.png" width=700>
+
+<img src="QQplot_20250313.png" width=700>
