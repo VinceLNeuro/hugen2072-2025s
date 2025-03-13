@@ -1,0 +1,328 @@
+---
+title: "HUGEN 2072 Project 3 - GWAS of height"
+author: "Tianze (Vincent) Luo adapted"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: show
+    toc: true
+    toc_float: 
+        collapsed: no
+    df_print: paged
+    number_sections: no
+    theme: cosmo
+editor_options:
+    chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+# Instructions
+Below is a guided tutorial to perform a genome-wide association study (GWAS) of height. Some code has been provided to you and some you will need to write yourself.
+
+Project 3 has three components:
+
+* **Scripting/coding**: read through this file and complete the pipeline by contributing your code *where indicated*.
+
+* **Narrative**: knit the completed .Rmd to a code-integrated HTML report of your QC process and decisions.
+
+  * Your report must answer all the questions and perform all the tasks indicated in the instructions/prompts given for each step.
+
+  * You must submit a successfully-knitted HTML file and the `.Rmd` in order to earn a passing grade for this project.
+
+  * Set up your report to flow like an actual document you might show your supervisor to summarize the QC project, emphasizing what was done at each step rather than the code used to do it (e.g., how many samples/SNPs were filtered out at a given step?)
+
+  * **Submit your .Rmd and HTML to Canvas**
+
+* **Presentation**: you will make a 10-min (maximum) recording of yourself with Panopto in which you summarize this GWAS. Instructions will given on Canvas.
+
+In each part of this project you will implement one of the main steps of GWAS (some steps completed for you). 
+
+
+**Since the pipeline below is incomplete, some of the R code chunks are set to `eval=FALSE` so that knitting to HTML will succeed. You will need to change them to `eval=TRUE` as you progress so that your knitted document shows the results of running each chunk.**
+
+**However, some chunks are very computationally intensive, produce a file that can be used without re-running the chunk. To make knitting to HTML faster, I have indicated which chunks you can set to `eval=FALSE` after you have produced the required files.**
+
+**It is expected that you will copy this file somewhere to your directory on the CRC cluster so that you can use the RStudio Server, where all the packages you need have been installed already.**
+
+## Part 0 - Setup Workspace and Load Sample Data
+
+First, load the packages we'll be using.
+
+```{r load_packages, message=F, eval=TRUE}
+
+# Load the required packages for the project (Install them if necessary)
+
+library("tidyverse", quietly = TRUE)
+library("GWASTools", quietly = TRUE)
+library("GWASdata", quietly = TRUE)
+library("SNPRelate", quietly = TRUE)
+library("GENESIS", quietly = TRUE)
+library("GGally", quietly = TRUE)
+library("qqman", quietly = TRUE)
+
+# Close any open GDS files before proceeding (think of this as starting off with a 'blank slate')
+
+showfile.gds(closeall = T, verbose = T)
+```
+
+
+All of the files you will need are located on the cluster in `/ix1/hugen2072_2025s/p3/`.
+
+```
+p3_sample_info.RData
+p3_variant_info.RData
+p3_pca.RData
+p3_grm.RData
+p3_imputed_data.gds
+```
+
+To start, load in the sample information file and examine it. 
+
+```{r part0_sample}
+
+# path to folder for project
+#my_folder <- "/ix1/hugen2072-2025s/p3/"
+my_folder <- "/bgfs/jcarlson/hugen2072/project3_GWAS/files_for_students/"
+
+# load the sample info file
+load(paste0(my_folder, "p3_sample_info.RData"), verbose = TRUE)
+
+# what type of data file is sample.info
+class(sample.info)
+
+# examine contents
+head(pData(sample.info))
+
+```
+
+
+## Part 0 - Report
+
+Describe the sample to use in this study. How many individuals are there? What measurements (variables) are there? 
+
+Describe the distribution of the phenotype height. Does it vary by sex or population (pop)?
+
+Based on your findings, do you think you should include sex or pop as covariates in a GWAS for height?  
+
+
+```{r part0_report}
+
+# Your code goes here
+
+```
+
+
+## Part 1 - Imputed genotypes
+
+Imputed genotypes were obtained using the TOPMed Imputation Server (and then downsampled for computational ease). Information about the resulting variants is in `p3_variant_info.RData`. The imputed genotypes themselves have been converted to a SNP GDS file, `p3_imputed_data.gds`.
+
+Load in the SNP information file and explore it. The columns are:
+
+- snp.id: the variant id used in the GDS 
+- chr: chromosome  
+- pos: position  
+- alleles: allele codes (ref, alt)  
+- af: alt allele frequency  
+- r2: imputation r-squared  
+- genotyped: TRUE if genotyped, FALSE if imputed
+
+```{r part1_geno}
+
+# load in SNP information file
+load(paste0(my_folder, "p3_variant_info.RData"), verbose = TRUE)
+
+# counts of imputed vs. genotyped variants
+snp.info %>% count(genotyped)
+
+# explore imputation quality r2
+ggplot(data = snp.info, aes(x=r2)) + 
+  geom_histogram() 
+
+# explore allele frequency
+ggplot(data = snp.info, aes(x=af)) + 
+  geom_histogram()
+
+snp.info %>% count(af == 0 | af == 1)
+
+```
+
+
+Decide on reasonable filters for these SNPs to be included in a GWAS for this sample. Base this decision on your exploration of the `snp.info` and content from class. You will be guided to think about specific aspects for these filters in the reporting section below. 
+
+Create a list of SNPs to use for downstream analyses, implementing your chosen filters. **You will need to put your criteria for SNPs to include inside the `filter` function.** Running the template code as is will not perform any filtering.
+
+```{r part1_snp_filter}
+
+# make list of snp.ids for SNPs passing filters using snp.info 
+snps.keep <- snp.info %>% filter() %>% pull(snp.id)
+
+```
+
+
+## Part 1 - Report
+
+How many variants are present in the imputed genotypes GDS file? 
+
+How many variants are imputed and how many are genotyped?
+
+Make a plot showing the distribution of imputation quality (r2). What do you think is a reasonable threshold to set for keeping SNPs based on this?
+
+Make a plot showing the distribution of allele frequencies. What do you think is a reasonable threshold to set for keeping SNPs based on this?
+
+How many variants are you going to include in your analyses (those that have high imputation quality and are common enough to include in a GWAS)?
+
+
+```{r part1_report}
+
+# Your code goes here
+
+```
+
+## Part 2 - Principle Components of Ancestry
+
+You have been provided with pre-calculated principal components of ancestry in `p3_pca.RData`. This file contains two data objects: `mypcair` the output from pcair and `pca` a data frame with 32 PCAs and scanID. 
+
+Merge this with the sample.info information and create plots of the PCAs. **You will need to decide how many PCAs to retain for analysis.** The code below keeps all 32 PCAs.  
+
+
+```{r part2_pca}
+
+# load PCA object
+load(paste0(my_folder, "p3_pca.RData"), verbose = TRUE)
+
+# make scree plot
+dat <- data.frame(pc=1:32, varprop=mypcair$varprop[1:32])
+ggplot(dat, aes(x=factor(pc), y=100*varprop)) +
+  geom_point() + theme_bw() +
+  xlab("PC") + ylab("Percent of variance accounted for")
+
+# make exploratory plots
+plot(mypcair) # PC1 and PC2
+plot(mypcair, vx = 3, vy =  4) # PC3 and PC4
+
+# merge with sample.info to get pop code 
+pca <- left_join(pca, pData(sample.info), by="scanID")
+
+# make parallel coordinates plot colored by pop code
+ggparcoord(pca, columns=1:15, groupColumn="pop", alphaLines=0.5, scale="uniminmax") +
+    guides(colour=guide_legend(override.aes=list(alpha=1, size=2))) +
+    theme_bw() + xlab("PC") + ylab("")
+
+# decide how many PCAs to include in the GWAS 
+# add the PCA values to the scan annotation file to include them in the GWAS
+# (change 32 to your selected number)
+sample.info.pcs <- pca %>% select(scanID, sex, pop, height, PC1:PC32)
+sample.info.pcs <- ScanAnnotationDataFrame(sample.info.pcs)
+sample.info.pcs
+
+```
+
+
+## Part 2 - Report
+
+How many principal components of ancestry will you include as covariates in the GWAS? Why did you choose this number?
+
+
+```{r part2_report}
+
+# Your code goes here
+
+```
+
+
+## Part 3 - Null Model
+
+PC-Relate was already run and the results are stored in `p3_grm.RData`. This file contains a genetic relatedness matrix (called `GRM`) and the results from pc-relate `mypcrelate`. 
+
+Create a kinship plot to examine relatedness among the sample. 
+
+
+```{r part3_relatedness}
+
+# Load in pc-relate results
+load(paste0(my_folder, "p3_grm.RData"), verbose = TRUE)
+
+# Make kinship plot
+plot(mypcrelate$kinBtwn$k0, mypcrelate$kinBtwn$kin, xlab="k0", ylab="kinship")
+
+```
+
+Decide on a null model to use for a GWAS of height for this sample. You will be guided to think about specific aspects for these filters in the reporting section below. 
+
+Run the null model in the chunk below. **You will need to supply the code for running the null model.**
+
+
+```{r part3_null_model}
+
+# run the null model here (write code to do so)
+
+
+```
+
+## Part 3 - Report
+
+Do you think you should account for relatedness with a genetic relatedness matrix?  
+
+What type of model should be used for a GWAS of height (linear or logistic)? 
+
+Does the height phenotype appear to follow a normal distribution closely enough, or do you think we should use an inverse normal transformed phenotype here? Explain. 
+
+What covariates are included in the null model? (Hint: think back to your findings in part 0 and part 2.)
+
+
+```{r part3_report}
+
+# Your code goes here
+
+```
+
+
+## Part 4 - Association Test
+
+Now, you will finally run the genotype association tests for the GWAS. The imputed genotypes are available as a SNP GDS file, `p3_imputed_data.gds`. Using this and the null model you created in Part 3, run the single variant association tests genome-wide using an additive genetic model. **You will need to EDIT code to achieve this and turn `eval=TRUE` in this chunk. To get this to run in RStudio make sure you leave the BPPARAM option as `BPPARAM=BiocParallel::SerialParam()`.**    
+
+
+```{r part4_assoc, eval=FALSE}
+
+# read in GDS file
+gdsfile <- paste0(my_folder, "p3_imputed_data.gds")
+
+# create genotype data object
+geno <- GdsGenotypeReader(filename = gdsfile)
+genoData <- GenotypeData(geno)
+genoData
+
+# create the genotype block iterator
+iterator <- GenotypeBlockIterator(genoData, snpBlock=5000, snpInclude=snps.keep)
+
+# run association test 
+#  REPLACE your_null_model WITH YOUR NULL MODEL OBJECT FROM PART 3
+assoc <- assocTestSingle(iterator, 
+                         null.model = your_null_model,
+                         BPPARAM=BiocParallel::SerialParam())
+
+
+```
+
+
+## Part 4 - Report
+
+Make Q-Q plot for these GWAS results (not the phenotype) and calculate the genomic inflation factor, $\lambda_GC$. Does there appear to be any inflation in these results?
+
+Make a Manhattan plot for these results. How many genome-wide significant regions (p < 5e-8) do you observe?
+
+Which variant is the most significantly associated with height? What is the effect size estimate from the model for this variant? 
+
+```{r part4_report}
+
+# Your code goes here
+
+
+```
+
+
