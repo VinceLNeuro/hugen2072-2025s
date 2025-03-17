@@ -542,6 +542,60 @@ fastman(m = assoc, chr="chr", bp="pos", p="Score.pval", snp = "uniq.var.id",
 assoc %>% filter(Score.pval < 5e-8)
 
 
+################ suggestive threshold provided ################
+df_topHits_suggest = 
+    assoc %>% filter(Score.pval < 5e-5) %>%
+    select(chr, pos, uniq.var.id, Est, Est.SE, Score.pval, freq)
+df_topHits_suggest #lack ref/alt & mapped or nearest gene
+
+# Use snpAnnot file to merge ref/alt: alleles -> [ref, alt]
+snpAnnot = 
+    snp.info %>% 
+    select(chr,pos,alleles) %>% 
+    separate_wider_delim(alleles, ",", names = c("Ref", "Alt"))
+snpAnnot$chr = as.numeric(snpAnnot$chr)
+snpAnnot
+
+FINAL_TAB = 
+    left_join(x= df_topHits_suggest, 
+          y= snpAnnot,
+          by = c("chr","pos")) %>%
+    relocate(c("Ref", "Alt"), .after = "pos") %>% #change columns sequence
+    rename(Chr = chr,
+           Pos = pos,
+           Effect = Alt,
+           SNP = uniq.var.id,
+           Effect_freq = freq) %>% #new_name = old_name
+    separate_wider_delim(SNP, #clean the SNP col
+                         "_", names = c("SNP", "drop")) %>% select(-drop)
+FINAL_TAB
+
+# bring in the gene-names
+ls_nearest_genes = c("DAZL", "HTR1F", "SUCLA2", "LASP1", "UQCRFS1")
+FINAL_TAB$Nearest_Gene = ls_nearest_genes
+
+FINAL_TAB
+### output ###
+# write_csv(FINAL_TAB, file="p03-GWAS/topHits_above5e-5_20250317.csv")
+
+
+# Plot
+fastman(m = assoc, chr="chr", bp="pos", p="Score.pval", snp = "uniq.var.id",
+        suggestiveline = -log10(5e-5),
+        genomewideline = -log10(5e-8),
+        annotationWinMb = 0.5,
+        annotateTop = TRUE,
+        annotatePval = 5e-5,
+        colAbovePval = TRUE,
+        # axis size (default=0.6), point size (0.4), label size (0.4)
+        cex.axis = 0.8, cex = 0.6, cex.text = 0.6,
+        
+        annotationAngle=20, #for including a title
+        main = "GWAS of height (suggestive-threshold = 5e-5)")
+    
+###############################################################
+
+
 ## Which variant is the most significantly associated with height? 
 ## What is the effect size estimate from the model for this variant? 
 assoc %>% arrange(Score.pval) %>% slice(1) 
