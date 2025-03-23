@@ -1,0 +1,22 @@
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+|       EasyQC	       |    v23.8   |        05/June/2020     |
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+|  (C) 2013 Thomas Winkler, GNU General Public License, v3   |
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+|  For bug-report, please e-mail:                            |
+|  thomas.winkler@klinik.uni-regensburg.de                   |
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++
+Starting EasyX: 2025-03-23 13:37:19.268284 
+Running script  ./EasyQC_dir/ecf/p4_gwas1_gwas2.ecf ...
+
++++++
+Getting list of input files ...
+Using:
+Error in GWADATA.init(container.GWADATA[[i]]) : EASY ERROR:
+ pathOut 
+ ../output
+ does not exist!
+ Please use DEFINE or EASYIN statement to set pathOut.
+

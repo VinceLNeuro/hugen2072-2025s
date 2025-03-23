@@ -1,0 +1,35 @@
+
+echo "Job started at: $(date)"
+Job started at: Sun Mar 23 11:24:23 EDT 2025
+
+#### Main analysis ####
+
+# The 'sum' modifier causes sums (Linear Comb. Sum) to be reported instead.
+plink --bfile /ix1/hugen2072-2025s/p4/p4_study1 \
+    --score /ix1/hugen2072-2025s/p4/p4_pgs002975_scores.txt header sum \
+    --out ./study1_scored
+PLINK v1.90b6.7 64-bit (2 Dec 2018)            www.cog-genomics.org/plink/1.9/
+(C) 2005-2018 Shaun Purcell, Christopher Chang   GNU General Public License v3
+Logging to ./study1_scored.log.
+Options in effect:
+  --bfile /ix1/hugen2072-2025s/p4/p4_study1
+  --out ./study1_scored
+  --score /ix1/hugen2072-2025s/p4/p4_pgs002975_scores.txt header sum
+
+192066 MB RAM detected; reserving 96033 MB for main workspace.
+647629 variants loaded from .bim file.
+2548 people (0 males, 0 females, 2548 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to ./study1_scored.nosex .
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 2548 founders and 0 nonfounders present.
+Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
+647629 variants and 2548 people pass filters and QC.
+Note: No phenotypes present.
+--score: 181 valid predictors loaded.
+--score: Results written to ./study1_scored.profile .
+
+#### Main analysis end ####
+
+echo "Job ended at: $(date) on node $HOSTNAME"
+Job ended at: Sun Mar 23 11:24:27 EDT 2025 on node teach-cpu-n0
+

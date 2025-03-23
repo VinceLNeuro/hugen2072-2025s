@@ -1,0 +1,24 @@
+PLINK v1.90b6.7 64-bit (2 Dec 2018)
+Options in effect:
+  --bfile /ix1/hugen2072-2025s/p4/p4_study1
+  --out ./study1_scored
+  --score /ix1/hugen2072-2025s/p4/p4_pgs002975_scores.txt header sum
+
+Hostname: teach-cpu-n0.crc.pitt.edu
+Working directory: /ihome/mmarazita/til177/GitHub/hugen2072-2025s/p04-postGWAS-analyses/PGS_score_calc
+Start time: Sun Mar 23 11:24:23 2025
+
+Random number seed: 1742743463
+192066 MB RAM detected; reserving 96033 MB for main workspace.
+647629 variants loaded from .bim file.
+2548 people (0 males, 0 females, 2548 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to ./study1_scored.nosex .
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 2548 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+647629 variants and 2548 people pass filters and QC.
+Note: No phenotypes present.
+--score: 181 valid predictors loaded.
+--score: Results written to ./study1_scored.profile .
+
+End time: Sun Mar 23 11:24:27 2025

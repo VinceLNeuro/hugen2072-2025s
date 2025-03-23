@@ -57,6 +57,7 @@ In each part of this project you will implement one analysis strategy we learned
 First, load the packages we'll be using.
 
 ```{r load_packages, message=F, eval=TRUE}
+rm(list=ls())
 
 # Load the required packages for the project (Install them if necessary)
 
@@ -290,17 +291,20 @@ ggplot(df_pheno_w_dosage, aes(x=as.factor(refDosage_var542766), y=height)) +
     				inherit.aes=FALSE) + 
     labs(x = "Effect/Ref allele (19:28492903:C) dosage")
 
+
+# Close gds file
+seqClose(gds)
 ```
 
 ---
 
 ## Part 2 - Aggregate Test
 
-A prior study (https://www.nature.com/articles/s41467-024-52579-w#MOESM4) found that variants near the gene HMGA1 were associated with greater height. We are going to test if variants in this region show an effect in our study. 
+A prior study (https://www.nature.com/articles/s41467-024-52579-w#MOESM4) found that variants near the gene **HMGA1** were associated with **greater height**. We are going to test if variants in this region show an effect in our study. 
 
-For reference, the boundaries of the gene HMGA1 are chr6:34236873-34246231.
+For reference, the boundaries of the gene HMGA1 are **chr6:34236873-34246231**.
 
-Edit the code below to perform aggregate tests for this gene region +/- 50kb. Run a burden test, a SKAT test, and a SKAT-O test. **NOTE: when running multiple tests you need to reset the iterator after each test.** You will need to turn `eval=TRUE` before knitting. 
+Edit the code below to perform aggregate tests for this **gene region +/- 50kb**. Run a burden test, a SKAT test, and a SKAT-O test. **NOTE: when running multiple tests you need to reset the iterator after each test.** You will need to turn `eval=TRUE` before knitting. 
 
 ```{r part2_agg, eval = TRUE}
 
@@ -314,26 +318,55 @@ gds <- seqOpen(paste0(shared_folder, "p4_study1_imputed_data.gds"))
 seqData <- SeqVarData(gds, sampleData=annot)
 seqData
 
+
+#### Gene-based Iterator ####
 # YOU EDIT: Filter to the chromosome of interest
-seqSetFilterChrom(seqData)
+seqSetFilterChrom(seqData, include = "6")
+#check
+seqGetData(seqData, "chromosome") %>% unique()
 
 # YOU EDIT: make a GRanges object for this gene region +/- 50kb
-gr <- GRanges()
+    # **chr6:34236873-34246231**
+gr <- GRanges(seqnames = 6, 
+              ranges = IRanges(start=34236873-50e3, end = 34246231+50e3))
 
-# Run a burden test            
+
+#### Statistical Methods ####
+# 1. Run a burden test            
 iterator <- SeqVarRangeIterator(seqData, gr)
 assoc_burden <- assocTestAggregate(iterator, 
-                                   null.model,
-                                   AF.max = 1,
+                                   null.model, 
+                                   AF.max = 1, #not just rare variants
                                    test="Burden")
-
 seqResetFilter(iterator)
 
-# Run a SKAT test
-# your code here
+assoc_burden$results
+assoc_burden$variantInfo[[1]]
 
-# Run a SKAT-O test
+
+# 2. Run a SKAT test
 # your code here
+iterator <- SeqVarRangeIterator(seqData, gr)
+assoc_SKAT <- assocTestAggregate(iterator, 
+                                   null.model, 
+                                   AF.max = 1, #not just rare variants
+                                   test="SKAT")
+seqResetFilter(iterator)
+
+assoc_SKAT$results
+
+
+# 3. Run a SKAT-O test
+# your code here
+iterator <- SeqVarRangeIterator(seqData, gr)
+assoc_SKATO <- assocTestAggregate(iterator, 
+                                   null.model, 
+                                   AF.max = 1, #not just rare variants
+                                   test="SKATO")
+seqResetFilter(iterator)
+
+assoc_SKATO$results
+
 
 # Close gds file
 seqClose(gds)
@@ -344,14 +377,45 @@ seqClose(gds)
 
 For each of the three aggregate testing methods (burden, SKAT, and SKAT-O), report the number of variants tested in the region of interest, and the corresponding p-values.
 
+- A2.1. `assoc_burden`, `assoc_SKAT`, `assoc_SKATO`
+
+```{r echo=FALSE, results='asis'}
+library(knitr)
+
+data.frame(
+    "testing.methods" = c("burden", "SKAT", "SKATO"),
+    "number.of.variants"=c(assoc_burden$variantInfo[[1]] %>% nrow(),
+                           assoc_SKAT$variantInfo[[1]] %>% nrow(),
+                           assoc_SKATO$variantInfo[[1]] %>% nrow()),
+    "P-value"=c(assoc_burden$results %>% pull(Score.pval) %>% round(2),
+                assoc_SKAT$results %>% pull(pval) %>% round(2),
+                assoc_SKATO$results %>% pull(pval_SKATO) %>% round(2))
+    ) %>% kable(caption="Aggregate Test Results")
+
+```
+
+
 Do the results of the three tests come to the same conclusions?
 
+- A2.2. Yes. They all aggregated 4 variants (either rare or common), all of which were non-significant (p>0.05)
+
 Do any of these tests show evidence of association between variants near our gene of interest (HMGA1)?
+
+- A2.3. No. They all yielded non-significant results.
 
 ```{r part2_report}
 
 # Your code goes here
 
+# data.frame(
+#     "testing.methods" = c("burden", "SKAT", "SKATO"),
+#     "number.of.variants"=c(assoc_burden$variantInfo[[1]] %>% nrow(),
+#                            assoc_SKAT$variantInfo[[1]] %>% nrow(),
+#                            assoc_SKATO$variantInfo[[1]] %>% nrow()),
+#     "P-value"=c(assoc_burden$results %>% pull(Score.pval) %>% round(2),
+#                 assoc_SKAT$results %>% pull(pval) %>% round(2),
+#                 assoc_SKATO$results %>% pull(pval_SKATO) %>% round(2))
+#     ) %>% kable(caption="Aggregate Test Results")
 
 ```
 
@@ -367,12 +431,19 @@ Edit the template code below to point the output to your directory in the `--out
 Then run the code below. At the command line, load PLINK with `module load plink/1.90b6.7`, then run the PLINK command.
 
 
-```
-module load plink/1.90b6.7
+```{bash}
+ls
+echo ""
+ls PGS_score_calc
+echo ""
 
-plink --bfile /ix1/hugen2072-2025s/p4/p4_study1 \
---score /ix1/hugen2072-2025s/p4/p4_pgs002975_scores.txt header sum \
---out ./study1_scored 
+cat PGS_score_calc/pgs_calc_slurm.sh
+
+#module load plink/1.90b6.7
+#
+#plink --bfile /ix1/hugen2072-2025s/p4/p4_study1 \
+#    --score /ix1/hugen2072-2025s/p4/p4_pgs002975_scores.txt header sum \
+#    --out ./study1_scored 
 
 ```
 
@@ -383,13 +454,15 @@ Read the `.profile` file created by PLINK, which contains the values of the PGS 
 ```{r part3_pgs, eval = TRUE}
 
 # Change the path to point to where your PLINK output file is
-scores <- read_table("./study1_scored.profile",
+scores <- read_table("./PGS_score_calc/study1_scored.profile",
                      col_names = TRUE,
-                     na = "-9")
+                     na = "-9") #for plink output
 scores
 
+# merge with pheno file
 phenotypes <- pData(annot) %>% 
-                  inner_join(., scores %>% select(IID, SCORESUM),
+                  inner_join(., 
+                             scores %>% select(IID, SCORESUM),
                              by=c("sample.id" = "IID"))
 
 head(phenotypes)
@@ -399,16 +472,71 @@ head(phenotypes)
 ## Part 3 - Report
 
 How many SNPs were in the starting PGS scoring files were used here?
+
+- A3.1. **182 SNPs** were in the starting PGS scoring files. 
+
+```{bash}
+# score file
+wc -l /ix1/hugen2072-2025s/p4/p4_pgs002975_scores.txt
+```
+
+
 How many variants matched the PLINK files for the imputed data?
+
+- A3.2. **181 valid/matched predictors** (However, direct comparison showed 182 matches; maybe it is because some variants have high missing rates in the samples, which were dropped.)
+
+```{bash}
+#Q: How many variants matched the PLINK files for the imputed data?
+
+# get variants in pgs file
+#awk '{print $1}' /ix1/hugen2072-2025s/p4/p4_pgs002975_scores.txt > ls_pgs_variants.txt
+
+# get variants in plink file
+#awk '{print $2}' /ix1/hugen2072-2025s/p4/p4_study1.bim > ls_plink_bim_variants.txt
+
+# compare the two files 
+    # -f: extract pattern from file
+    # -F: list of pattern to match
+    # -x: match whole line
+    # -c: count of matches
+grep -Fxf PGS_score_calc/ls_pgs_variants.txt -c PGS_score_calc/ls_plink_bim_variants.txt #182
+
+#### However, the log file says 181 valid predictors
+cat PGS_score_calc/apply_pgs-slurm_10238.out | grep -e "^--score.*"
+```
+
 
 Based on these results from above applying the PGS for height, evaluate the utility of this PGS in predicting height.
 Make sure you report the PGS p-value, phenotypic variance explained (partial r2), and an effect size estimate.
+
+- A3.3. The table of parameters were shown below.
 
 ```{r part3_report}
 
 # Your code goes here
 
+## association with height (linear model), adjusting for covariates
+eval_lm = lm(height ~ SCORESUM + factor(sex) + factor(pop), data=phenotypes)
+summary(eval_lm)
 
+
+## report: p-value, partial-R2, adjusted-R2, effect size [95%CI]
+summary(eval_lm)
+
+#calculate partial R2
+partial_r2 = rsq.partial(objF=eval_lm)
+partial_r2
+
+#calculate 95% CI
+CI_0.95 = confint(eval_lm)[2,] %>% round(2) %>% paste(collapse = ",")
+
+## kable output
+data.frame("variable"="SCORESUM",
+           "p-value"= 0.19,
+           "partial R2"= "0.00067 (0.067%)", 
+           "adjusted R2"= 0.73, #accounting for sex and population, total var explained
+           "effect size [95%CI]"= paste0("0.68 [",CI_0.95,"]"),
+           check.names = FALSE) %>% kable()
 ```
 
 ## Part 4 - File Harmonization Before Meta Analysis
@@ -420,14 +548,14 @@ EasyQC is primarily checking that the GWAS output isn't nonsensical and that all
 
 The following files are provided for this part:
 
--   `gwas1_results.txt` - standardized results from the GWAS of height from project 3
--   `gwas2_results.txt` - results from a GWAS for height from the UK Biobank (positions are in hg38) (that have been downsampled for you)
--   `gwas1_gwas2.ecf` - a configuration file for EasyQC
--   `annot.txt` - an annotation file containing population allele frequencies
+-   `p4_study1_gwas_results.txt` - standardized results from the GWAS of height from project 3
+-   `p4_study2_gwas_results.txt` - results from a GWAS for height from the UK Biobank (positions are in hg38) (that have been downsampled for you)
+-   `p4_gwas1_gwas2.ecf` - **a configuration file for EasyQC**
+-   `p4_snp_reference.txt` - an annotation file containing population allele frequencies
 
-The configuration file `gwas1_gwas2.ecf` is almost entirely set up for you.
+The configuration file `p4_gwas1_gwas2.ecf` is almost entirely set up for you.
 You only need to make a few changes.
-Copy the file `gwas1_gwas2.ecf` to your home directory.
+Copy the file `p4_gwas1_gwas2.ecf` to your home directory.
 
 -   First read through the file and the comments.
     The documentation (<https://homepages.uni-regensburg.de/~wit59712/easyqc/EasyQC_9.0_Commands_140918_2.pdf>) also explains how the program works.
@@ -441,7 +569,7 @@ This will take a few minutes.
 The output includes a log, report (with counts of the number of variants dropped for each cleaning step), some plots, some more files containing information about variants failing some of the filters, and the cleaned data (i.e., GWAS results with problematic variants removed).
 
 Note: everything that you will need to move forward is created as output files.
-So, you can run the next code chunk once and then leave `eval=FALSE` for the chunk when you knit this file.
+*So, you can run the next code chunk once and then leave `eval=FALSE` for the chunk when you knit this file.*
 
 Also note that multiple runs of this script file does NOT overwrite the results, it names them with successful counters (e.g., CLEANED.study_1.gz CLEANED_study_1.1.gz).
 I recommend you only run this once, otherwise you will need to carefully edit the metal script in part 5 to point to the correct files.
@@ -450,7 +578,8 @@ I recommend you only run this once, otherwise you will need to carefully edit th
 
 # Process the GWAS files with EasyQC
 # change this to the path to your folder where you have your copy of the ecf file
-EasyQC("./p4_gwas1_gwas2.ecf")
+
+# EasyQC("./EasyQC_dir/ecf/p4_gwas1_gwas2.ecf")
 
 ```
 
@@ -460,18 +589,122 @@ Read the cleaned individual GWAS results (`CLEANED.study_1.gz` and `CLEANED.stud
 
 Summarize the sample sizes for the two individual GWASs.
 
+- A4.1. $N_{\text{study1}} = 2,548$ & $N_{\text{study2}} = 360,388$
+
+
 How many variants were in each of the two individual GWAS (after EasyQC filtering)?
+
+- A4.2. After EasyQC filters and further cleaning the duplicates (exactly the same rows), **study1 has 104,624 variants** & **study2 has 481,320 variants**.
+
 
 According to the EasyQC report, how many variants were dropped from each?
 
+- A4.3. According to EasyQC report, for study1, 205	variants were added to it, with (104670-104624) 46 variants further dropped due to duplicated rows. For study2, 6,847 variants were dropped with (482068-481320) 748 variants dropped due to duplicated rows.
+
+
 How many were flagged for allele frequency discrepancies, for being duplicates, or for failing some other validity check?
+
+- A4.4. Flagged
+    - **study1**
+        - *n=207*, flagged for allele frequency discrepancies comparing with reference allele frequency (i.e., allele.freq outliers, `AFCHECK.numOutlier`)
+        - *n=1*, flagged for being duplicates (`numDuplicates.cptid`)
+        - *n=1798*, flagged for other validity checks -> not available in reference file
+        
+    - **study2**
+        - *n=24084*,flagged for allele frequency discrepancies
+        - *n=7244*, flagged for being duplicates
+        - *n=39670*, flagged for other validity checks -> 31 invalid SE, 2 invalid beta, 41 monomorphic alleles, 39130 not in reference file, 466 mismatches with reference file
 
 ```{r part4_report}
 
 # Your code goes here
 
+# Read in 1) CLEANED.study1.gz, 2) CLEANED.study2.gz, #\t delimed
+#         3) p4_gwas1_gwas2.rep
+
+study1 = read_delim(file = "./EasyQC_dir/output/CLEANED.study1.gz", #auto-uncompressed
+                    col_names = TRUE,
+                    # col_types = c("c","i","i", "c","c","c", "d","d","d","d", "i","i"),
+                    na = ".") #-- strMissing .
+
+study2 = read_delim(file = "./EasyQC_dir/output/CLEANED.study2.gz", 
+                    col_names = TRUE,
+                    na = ".")
+
+easyQC_report = read_delim(file = "./EasyQC_dir/output/p4_gwas1_gwas2.rep", #\t
+                            col_names = TRUE)
+           
+#### A4.1. ####
+unique(study1$N)
+unique(study2$N)
+
+#### A4.2. ####
+## Check n_variants for study1
+nrow(study1)
+study1 %>% select(cptid, STRAND, EFFECT_ALLELE, OTHER_ALLELE) %>% distinct() %>% nrow()
+
+# duplicates?
+study1 %>% group_by(cptid, STRAND, EFFECT_ALLELE, OTHER_ALLELE) %>%
+    count() %>%
+    filter(n>1)
+study1 %>% filter(cptid =="10:59402282") #YES
+
+## Remake study1 and study2
+# nrow(study1) #104670 before
+study1 = study1 %>% distinct()
+nrow(study1)
+
+# nrow(study2) #482068 before
+study2 = study2 %>% distinct()
+nrow(study2)
 
 ```
+
+```{r}
+#### A4.3. ####
+
+#[NOTE] For duplicated rows, study1 dropped (104670-104624) 46 obs, study2 dropped (482068-481320) 748 obs.
+
+# study1
+easyQC_report %>% filter(fileInShortName == "study1") %>%
+    mutate(n_drop = numVarIn - numVarOut) %>% 
+    select(fileInShortName, n_drop)
+
+# study2
+easyQC_report %>% filter(fileInShortName == "study2") %>%
+    mutate(n_drop = numVarIn - numVarOut) %>% 
+    select(fileInShortName, n_drop)
+
+
+#### A4.4.####
+#Q: How many were flagged for allele frequency discrepancies, for being duplicates, or for failing some other validity check?
+
+### commands ###
+# allele frequency discrepancies    -> `AFCHECK`
+# duplicated                        -> `CLEANDUPLICATES`
+
+# failing some other validity check -> `CLEAN`, `ADJUSTALLELES`
+###          ###
+
+
+# 1+2: study1 & 2 for allele freq and duplicates
+easyQC_report %>% select(fileInShortName, AFCHECK.numOutlier, numDuplicates.cptid)
+
+
+# 3: study1 - other validity
+easyQC_report %>% filter(fileInShortName=="study1") %>%
+    select(numDrop_Missing_Alleles, numDrop_Missing_P, numDrop_Missing_BETA, numDrop_Missing_SE, numDrop_Missing_EAF, numDrop_Missing_N, numDrop_invalid_PVAL, numDrop_invalid_SE, numDrop_invalid_BETA, numDrop_invalid_EAF, numDrop_Monomorph, HA.HA.numDrop_BothAllelesMissing, HA.HA.numDrop_InvalidAlleles, 
+           NotInRef, #include all AA.*
+           AA.AlleleMismatch, AA.AlleleInMissing, AA.AlleleInInvalid, AA.StrandInInvalid) 
+
+# 3: study2 - other validity
+easyQC_report %>% filter(fileInShortName=="study2") %>%
+    select(numDrop_Missing_Alleles, numDrop_Missing_P, numDrop_Missing_BETA, numDrop_Missing_SE, numDrop_Missing_EAF, numDrop_Missing_N, numDrop_invalid_PVAL, numDrop_invalid_SE, numDrop_invalid_BETA, numDrop_invalid_EAF, numDrop_Monomorph, HA.HA.numDrop_BothAllelesMissing, HA.HA.numDrop_InvalidAlleles, 
+           NotInRef,
+           AA.AlleleMismatch, AA.AlleleInMissing, AA.AlleleInInvalid, AA.StrandInInvalid) #%>% mutate(sum=sum(.)) %>% select(sum)
+
+```
+
 
 ## Part 5 - Meta Analysis
 
@@ -503,7 +736,7 @@ Read the meta-analysis results (the .TBL file) into R and make Manhattan/Q-Q plo
 Edit the code provided below to point to the results file in your directory.
 You will need to turn on this chunk prior to knitting by setting `EVAL=TRUE`.
 
-```{r part5_meta, eval=TRUE}
+```{r part5_meta, eval=FALSE}
 
 # read in the METAL file
 # change the path to your folder where the meta analysis results are
@@ -552,3 +785,9 @@ If you want the opposite allele coding, you need to multiple the effect estimate
 
 
 ```
+
+
+```{r}
+sessionInfo()
+```
+
