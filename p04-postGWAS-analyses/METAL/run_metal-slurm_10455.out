@@ -1,0 +1,163 @@
+echo "Job started at: $(date)"
+Job started at: Mon Mar 24 22:30:23 EDT 2025
+#### Main analysis ####
+
+metal p4_metal_script.sh
+MetaAnalysis Helper - (c) 2007 - 2009 Goncalo Abecasis
+This version released on 2011-03-25
+
+# This program faciliates meta-analysis of genome-wide association studies.
+# Commonly used commands are listed below:
+#
+# Options for describing input files ...
+#   SEPARATOR        [WHITESPACE|COMMA|BOTH|TAB] (default = WHITESPACE)
+#   COLUMNCOUNTING   [STRICT|LENIENT]            (default = 'STRICT')
+#   MARKERLABEL      [LABEL]                     (default = 'MARKER')
+#   ALLELELABELS     [LABEL1 LABEL2]             (default = 'ALLELE1','ALLELE2')
+#   EFFECTLABEL      [LABEL|log(LABEL)]          (default = 'EFFECT')
+#   FLIP
+#
+# Options for filtering input files ...
+#   ADDFILTER        [LABEL CONDITION VALUE]     (example = ADDFILTER N > 10)
+#                    (available conditions are <, >, <=, >=, =, !=, IN)
+#   REMOVEFILTERS
+#
+# Options for sample size weighted meta-analysis ...
+#   WEIGHTLABEL      [LABEL]                     (default = 'N')
+#   PVALUELABEL      [LABEL]                     (default = 'PVALUE')
+#   DEFAULTWEIGHT    [NUMBER]                    (default = 1.0)
+#   MINWEIGHT        [NUMBER]                    (default = 1.0)
+#
+# Options for inverse variance weighted meta-analysis ...
+#   STDERRLABEL      [LABEL]                     (default = 'STDERR')
+#   SCHEME           [SAMPLESIZE|STDERR]         (default = SAMPLESIZE)
+#
+# Options to enable tracking of allele frequencies ...
+#   AVERAGEFREQ      [ON|OFF]                    (default = OFF)
+#   MINMAXFREQ       [ON|OFF]                    (default = OFF)
+#   FREQLABEL        [LABEL]                     (default = 'FREQ')
+#
+# Options to enable tracking of user defined variables ...
+#   CUSTOMVARIABLE   [VARNAME]
+#   LABEL            [VARNAME] AS [HEADER]
+#
+# Options to enable explicit strand information ...
+#   USESTRAND        [ON|OFF]                    (default = OFF)
+#   STRANDLABEL      [LABEL]                     (default = 'STRAND')
+#
+# Automatic genomic control correction of input statistics ...
+#   GENOMICCONTROL   [ON|OFF|VALUE|LIST snps.txt](default = OFF)
+#
+# Options for general analysis control ...
+#   PROCESSFILE      [FILENAME]
+#   OUTFILE          [PREFIX SUFFIX]             (default = 'METAANALYSIS','.TBL')
+#   MAXWARNINGS      [NUMBER]                    (default = 20)
+#   VERBOSE          [ON|OFF]                    (default = 'OFF')
+#   LOGPVALUE        [ON|OFF]                    (default = 'OFF')
+#   ANALYZE          [HETEROGENEITY]
+#   CLEAR
+
+# Options for general run control ...
+#   SOURCE           [SCRIPTFILE]
+#   RETURN
+#   QUIT
+
+# Processing commands in p4_metal_script.sh ...
+## Meta-analysis will be based on effect sizes and their standard errors ...
+## Set standard error header to SE ...
+## Genomic control correction of input statistics enabled
+## Set marker header to cptid ...
+## Set allele headers to EFFECT_ALLELE and OTHER_ALLELE ...
+## Set p-value header to PVAL ...
+## Set weight header to N ...
+## Set effect header to BETA ...
+## Set column separator to TAB ...
+## LENIENT MODE: Input lines can include extra columns, which will be ignored
+###########################################################################
+## Processing file '../EasyQC_dir/output/CLEANED.study1.gz'
+## WARNING: Marker '10:132940397' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:21268032' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:25119391' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:27128741' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:51768016' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:52823839' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:59402282' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:59402282' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:61573465' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:65439983' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:66661558' duplicated in input, first instance used, others skipped
+## WARNING: Marker '11:104407334' duplicated in input, first instance used, others skipped
+## WARNING: Marker '11:131336667' duplicated in input, first instance used, others skipped
+## WARNING: Marker '11:14229916' duplicated in input, first instance used, others skipped
+## WARNING: Marker '11:21417363' duplicated in input, first instance used, others skipped
+## WARNING: Marker '11:24143404' duplicated in input, first instance used, others skipped
+## WARNING: Marker '11:2777614' duplicated in input, first instance used, others skipped
+## WARNING: Marker '11:37157916' duplicated in input, first instance used, others skipped
+## WARNING: Marker '11:40485362' duplicated in input, first instance used, others skipped
+## WARNING: Marker '11:4546615' duplicated in input, first instance used, others skipped
+## WARNING: An additional 186 rows with duplicate marker names were ignored
+## Genomic control parameter is 1.017, adjusting test statistics
+## Processed 104464 markers ...
+
+## Set marker header to cptid ...
+## Set allele headers to EFFECT_ALLELE and OTHER_ALLELE ...
+## Set p-value header to PVAL ...
+## Set weight header to N ...
+## Set effect header to BETA ...
+## Set column separator to TAB ...
+## LENIENT MODE: Input lines can include extra columns, which will be ignored
+###########################################################################
+## Processing file '../EasyQC_dir/output/CLEANED.study2.gz'
+## WARNING: Bad alleles for marker '14:65418592', expecting 'a/g' found 'a/c'
+## WARNING: Bad alleles for marker '18:63995433', expecting 'a/t' found 'a/g'
+## WARNING: Bad alleles for marker '20:10320520', expecting 'a/c' found 'a/g'
+## WARNING: Bad alleles for marker '21:18183812', expecting 'a/c' found 'c/g'
+## WARNING: Bad alleles for marker '21:23729972', expecting 'a/t' found 'a/g'
+## WARNING: Bad alleles for marker '21:44838098', expecting 'c/g' found 'a/g'
+## WARNING: Bad alleles for marker '22:45110727', expecting 'a/t' found 'a/g'
+## WARNING: Bad alleles for marker '2:172729982', expecting 'a/c' found 'a/g'
+## WARNING: Bad alleles for marker '3:143416855', expecting 'a/g' found 'a/c'
+## WARNING: Bad alleles for marker '9:129771637', expecting 'c/g' found 'a/g'
+## WARNING: Marker '10:103031838' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:103341944' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:105054522' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:106264985' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:115722171' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:118814502' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:119665450' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:119826385' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:124485064' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:127793114' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:129036434' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:132404034' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:132940397' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:159131' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:20418000' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:21268032' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:22797183' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:23499362' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:24112593' duplicated in input, first instance used, others skipped
+## WARNING: Marker '10:26945787' duplicated in input, first instance used, others skipped
+## WARNING: An additional 904 rows with duplicate marker names were ignored
+## Genomic control parameter is 12.577, adjusting test statistics
+## Processed 481134 markers ...
+
+###########################################################################
+## Running second pass analysis to evaluate heterogeneity...
+## Processing file '../EasyQC_dir/output/CLEANED.study2.gz'
+## Processing file '../EasyQC_dir/output/CLEANED.study1.gz'
+
+###########################################################################
+## Executing meta-analysis ...
+## Complete results will be stored in file 'METAANALYSIS1.TBL'
+## Column descriptions will be stored in file 'METAANALYSIS1.TBL.info'
+## Completed meta-analysis for 519214 markers!
+## Smallest p-value is 2.178e-24 at marker '3:141402972'
+
+## Clearing all stored statistics ...
+# Clearing user defined filters ...
+
+#### Main analysis end ####
+echo "Job ended at: $(date) on node $HOSTNAME"
+Job ended at: Mon Mar 24 22:30:30 EDT 2025 on node teach-cpu-n0
+

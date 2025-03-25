@@ -732,29 +732,87 @@ metal metal_script.txt
 Note that multiple runs of this script file does NOT overwrite the results, it names them with successful counters (e.g., METAANALYSIS_1.TBL, METAANALYSIS2.TBL).
 Be sure you read in the results file you want to by editing the code below.
 
+
+```{bash}
+ls METAL
+cat METAL/METAANALYSIS1.TBL.info #show info/log file
+
+## Completed meta-analysis for 519214 markers!
+## Smallest p-value is 2.178e-24 at marker '3:141402972'
+```
+
 Read the meta-analysis results (the .TBL file) into R and make Manhattan/Q-Q plots for the meta-analysis results.
 Edit the code provided below to point to the results file in your directory.
 You will need to turn on this chunk prior to knitting by setting `EVAL=TRUE`.
 
-```{r part5_meta, eval=FALSE}
+```{r part5_meta, eval=TRUE}
 
 # read in the METAL file
 # change the path to your folder where the meta analysis results are
-meta <- read_delim("./METAANALYSIS1.TBL")
+meta <- read_delim("./METAL/METAANALYSIS1.TBL")
+head(meta) # Allele1 is the effect allele
 
 # create columns needed for manhattan plot
 meta <- meta %>% mutate(chr = str_split_i(MarkerName, ":", 1) %>% as.numeric(),
                         pos = str_split_i(MarkerName, ":", 2) %>% as.numeric())
+head(meta)
 
-# make a manhattan plot
-manhattan(meta,
-          chr = "chr", 
-          bp = "pos", 
-          snp = "MarkerName",
-          p = "P-value")
+#### make a manhattan plot ####
+library(fastman)
+fastman(m = meta, chr="chr", bp="pos", p="P-value", snp = "MarkerName",
+        maxP = NULL, #do not allow truncate on Y-value (default=14)
+        suggestiveline = -log10(5e-6),
+        genomewideline = -log10(5e-8),
+        annotationWinMb = 0.5,
+        annotateTop = TRUE,
+        annotatePval = 5e-8,
+        colAbovePval = TRUE,
+        # axis size (default=0.6), point size (0.4), label size (0.4)
+        cex.axis = 0.8, cex = 0.6, cex.text = 0.6,
+        ylim = c(0,25),
+        
+        annotationAngle=20, #for including a title
+        main = "Meta-analysis GWAS of height (suggestive-threshold = 5e-6)")
 
-# make a qq plot
-qq(meta$`P-value`)
+# # Allow ggrepel
+# options(ggrepel.max.overlaps = Inf)
+# png( paste0("METAL/meta_manhattan_",format(Sys.time(), "%Y%m%d"),".png"), width=10, height=6, units="in", res=300)
+# fastman_gg(m = meta, chr="chr", bp="pos", p="P-value", snp = "MarkerName",
+#            logp = TRUE, suggestiveline = -log10(5e-6), genomewideline = -log10(5e-8), maxP=NULL, repel = TRUE,
+#            annotatePval = 5e-8, colAbovePval=TRUE, annotateTop=TRUE, annotationWinMb = 0.5, annotationAngle=0,
+#            cex=0.9, cex.text=2, cex.axis=0.6, geneannotate = FALSE)
+# dev.off()
+
+
+#### QQ ####
+# sort p-values
+meta_p = meta %>%
+  arrange(`P-value`) %>%
+  pull(`P-value`)
+range(meta_p) #[1] 2.178e-24 1.000e+00
+
+# png( paste0("METAL/meta_qq_",format(Sys.time(), "%Y%m%d"),".png"),
+#     width = 6, height = 6, units = "in", res = 300)
+fastqq(meta_p, maxP=NULL) # 1.00327
+# dev.off()
+
+# verifying the calculation of lambda, by hand
+lambda = qchisq(median(meta_p, na.rm = TRUE), df=1, lower.tail = FALSE) / 
+    qchisq(0.5, df=1, lower.tail = FALSE)
+### additive coding of SNP (df=1)
+### lower.tail = FALSE: because p-value corresponds to the upper-tail cumulative P = P(X>x)
+cat( paste0("lambda = ",round(lambda,5),"\n") )
+
+
+
+# manhattan(meta,
+#           chr = "chr",
+#           bp = "pos",
+#           snp = "MarkerName",
+#           p = "P-value")
+# 
+# # make a qq plot
+# qq(meta$`P-value`)
 
 ```
 
@@ -762,26 +820,132 @@ qq(meta$`P-value`)
 
 Based on your reading of the metal script, what method of meta-analysis did we use?
 
+- A5.1. Inverse-variance weighted fixed effect (`SCHEME STDERR`)
+
+
 Using the meta-analysis results you read in above, do the following:
 
 Make a table summarizing effect directions across the two studies
 
+- A5.2. A table for the effect directions of variants between two studies were made.
+
+
 How many variants are shared across the two studies (i.e., how many have a non-missing effect and p-value in BOTH studies)?
+
+- A5.3. 66384 variants were shared (no '?' sign in `Direction`)
+
 
 How many variants are unique to each study?
 
+- A5.4. (Excluding the duplicated ones,) 38240 unique variants in study 1, and 414936 unique variants in study 2.
+
+
 What percentage of variants present in both studies have the same effect direction in both studies?
 
-For the most significant variant in the meta-analysis **that was present in both studies**, make a forest plot that shows the two individual study effect estimates and confidence intervals.
+- A5.5. Further made a table including only shared variants between studies. Around 50.25% of shared variants have the same effect direction in both studies. 
+
+
+For the **most significant** variant in the meta-analysis **that was present in both studies**, make a forest plot that shows the two individual study effect estimates and confidence intervals.
 Hint: you will need to read in the cleaned files from Easy QC for each study.
-Comment on whether the variant's effects seems to be homogeneous (based on the forest plot).
+**Comment on whether the variant's effects seems to be homogeneous (based on the forest plot**).
 
 **NOTE:** Metal returns Allele1 and Allele2 and the effects and directions it reports are for Allele1.
 If you want the opposite allele coding, you need to multiple the effect estimate by `-1`.
 
+- A5.6. Comparing the original summary stats files (`df_info.studies` -> effect allele is "C") and meta-analysis file (`most.sig.shared.variant` -> effect allele is "T"), and given that in METAL the **effect allele is Allele1**, we should flip the sign for effect size (or $\beta$). After more harmonizations, we created a data.frame `meta.results` for making the forest plot. 
+
+- Based on the forest plot, especially the 95% CI, the effect of the variant 20:35384250 (effect allele = C) is **homogeneous** between studies, while the point estimate effect size has opposite directions between studies. 
+
+
 ```{r part5_report}
 
-# Your code goes here
+#### A5.2 ####
+xtabs(~ meta$Direction)
+
+#### A5.3 ####
+n_shared = xtabs(~ meta$Direction)[c("--","++","-+","+-")] %>% sum() 
+n_shared #66384
+
+#### A5.4 ####
+nrow(study1) - n_shared
+nrow(study2) - n_shared
+
+#### A5.5 ####
+proptab_shared_variants = 
+    meta %>% filter(Direction %in% c("--","++","-+","+-")) %>% 
+    pull(Direction) %>%
+    table() %>% prop.table() %>% signif(5)
+proptab_shared_variants
+
+proptab_shared_variants[c("--","++")] %>% sum() #0.5025
+
+#### A5.6 ####
+# study1 %>% filter(cptid == "19:34984236")
+# study2 %>% filter(cptid == "19:34984236")
+
+meta_shared_sortedP = 
+    meta %>% filter(Direction %in% c("--","++","-+","+-")) %>% 
+    arrange(`P-value`) #sort by P
+
+most.sig.shared.variant = meta_shared_sortedP %>% slice_min(`P-value`)
+
+# make a forest plot that shows the two individual study effect estimates and confidence intervals.
+# Hint: you will need to read in the cleaned files from Easy QC for each study.
+# Comment on whether the variant's effects seems to be homogeneous (based on the forest plot).
+
+df_info.studies = rbind(
+    study1 %>% filter(cptid == most.sig.shared.variant$MarkerName) %>%
+        mutate(study="study1"),
+    study2 %>% filter(cptid == most.sig.shared.variant$MarkerName) %>%
+        mutate(study="study2")
+)
+
+df_info.studies
+most.sig.shared.variant
+
+
+#### selecting columns & harmonization & renaming ####
+clean_meta_result = 
+    most.sig.shared.variant %>% dplyr::select(Effect, StdErr) %>%
+        mutate(Effect = -Effect) %>% # effect size for "C" allele
+        mutate(study="meta") %>%
+        select(study, Effect, StdErr) %>% #clean the column sequence
+        dplyr::rename(BETA = Effect, 
+               SE = StdErr)
+clean_meta_result
+
+clean_studies = df_info.studies %>% select(study, BETA, SE)
+clean_studies
+
+# combine all
+meta.results = rbind(clean_studies, clean_meta_result)
+
+
+#### make forest plot for 20:35384250 (effect allele = "C") ####
+meta.results <- meta.results %>%
+    mutate(l95 = BETA -1.96*SE,
+	       u95 = BETA +1.96*SE)
+
+meta.results$study = factor(meta.results$study, levels = c("study1","study2","meta"))
+str(meta.results)
+meta.results
+
+ggplot(meta.results, aes(y = fct_rev(study)) ) +
+    geom_point(aes(x = BETA,
+                   size = factor(study == "meta"),
+                   shape = factor(study == "meta")) ) +
+    
+    geom_linerange(aes(xmin = l95, xmax = u95))  +
+    geom_vline(xintercept = 0, linetype="dashed") +
+    
+    scale_size_manual(values = c(2,5)) +    #define dot shape based on if "meta"
+    scale_shape_manual(values = c(16,18)) + #define dot shape based on factor 
+    theme_classic() +
+    theme(legend.position = "none",
+            axis.line.y = element_blank(),
+            axis.ticks.y= element_blank(),
+            axis.title.y= element_blank()) + 
+    labs(title = "20:35384250 (effect allele = C)")
 
 
 ```

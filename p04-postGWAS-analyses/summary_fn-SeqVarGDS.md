@@ -197,11 +197,22 @@ summary(eval_lm)
 
 ### EasyQC output major files in `./EasyQC_dir/output/`:
 
-Clean GWAS results
+- Clean GWAS results
   
   1) `CLEANED.study1.gz`
   2) `CLEANED.study2.gz`
 
-EasyQC report
+- EasyQC report
 
   3) `p4_gwas1_gwas2.rep`
+
+<br>
+
+## 5. Meta Analysis
+
+- Run `METAL`
+- Manhattan/Q-Q plots
+- Check sharing & uniqueness of variants across studies 
+- Find the most signficant **shared variants** --> `20:35384250 (effect allele = C)`
+  - Make Forest plot
+
