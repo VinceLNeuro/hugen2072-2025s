@@ -517,7 +517,6 @@ Make sure you report the PGS p-value, phenotypic variance explained (partial r2)
 
 ## association with height (linear model), adjusting for covariates
 eval_lm = lm(height ~ SCORESUM + factor(sex) + factor(pop), data=phenotypes)
-summary(eval_lm)
 
 
 ## report: p-value, partial-R2, adjusted-R2, effect size [95%CI]
@@ -538,6 +537,34 @@ data.frame("variable"="SCORESUM",
            "effect size [95%CI]"= paste0("0.68 [",CI_0.95,"]"),
            check.names = FALSE) %>% kable()
 ```
+
+
+**Additional analyses from the presentation**
+
+```{r}
+pgs_weightMat = read_table("/ix1/hugen2072-2025s/p4/p4_pgs002975_scores.txt",
+                           col_names = FALSE)
+pgs_weightMat
+
+### show distribution of the PGS effect weights ###
+ggplot(pgs_weightMat, aes(x = X3)) +
+    geom_histogram(color="grey", binwidth = 0.01) + 
+    labs(x = "PGS weights")
+
+### Plot height vs PGS score coloring points by sex ###
+phenotypes %>%
+    ggplot(aes(y=height, x=SCORESUM)) + 
+    geom_point(aes(color=sex)) + 
+    geom_smooth(method = "lm")
+
+phenotypes %>%
+    ggplot(aes(y=height, x=SCORESUM, color=sex)) + 
+    geom_point() + 
+    geom_smooth(color="black", method = "lm") + 
+    facet_grid(cols = vars(sex))
+
+```
+
 
 ## Part 4 - File Harmonization Before Meta Analysis
 
