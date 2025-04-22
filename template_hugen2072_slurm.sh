@@ -16,22 +16,17 @@
 #SBATCH --output=../RELATIVE/PATH/%x-slurm_%A.out
 
 ######## Load software into environment ########
+# set -euo pipefail # detect errors
+set -ev
 # module purge
 # module load plink/1.90_20230116 #gcc/8.2.0 bcftools/1.15.1
 
-set -e
-# set -euo pipefail # detect errors
-set -v            # print all commands
-
-echo "Job started at: $(date)"
-
 
 #### Main analysis ####
-
+echo "Job started at: $(date)"
 
 
 #### Main analysis end ####
 
 echo "Job ended at: $(date) on node $HOSTNAME"
 
-crc-job-stats

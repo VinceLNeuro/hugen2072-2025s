@@ -51,3 +51,8 @@ rsconnect/
 
 ## ignore p05 large files
 p05-WGS-analysis/toyRead-hg19/
+
+## ignore p06 large files
+p06-SV-calling/output/manta_test
+p06-SV-calling/output/NA*
+p06-SV-calling/p6
