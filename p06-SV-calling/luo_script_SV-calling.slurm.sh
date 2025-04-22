@@ -26,7 +26,7 @@ echo "Job started at: $(date)"
 ######## 1. Extract chr22 alignments ########
 mkdir -p output
 
-#   -T: required whenever writing __CRAM output__
+#   -T: required whenever writing __CRAM__
 samtools view -T p6/GRCh38_full_analysis_set_plus_decoy_hla.fa \
               -bS \
               -h p6/NA12778.final.cram chr22 \
