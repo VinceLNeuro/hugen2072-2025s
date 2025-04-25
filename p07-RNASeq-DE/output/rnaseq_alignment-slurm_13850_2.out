@@ -1,0 +1,164 @@
+module purge
+LMOD_DEFAULT_MODULEPATH="/ihome/crc/modules/Core"; export LMOD_DEFAULT_MODULEPATH; MODULEPATH="/ihome/crc/modules/Core"; export MODULEPATH; LMOD_DEFAULT_MODULEPATH="/ihome/crc/modules/Core"; export LMOD_DEFAULT_MODULEPATH; MODULEPATH="/ihome/crc/modules/Core"; export MODULEPATH; _ModuleTable001_="X01vZHVsZVRhYmxlXz17WyJhY3RpdmVTaXplIl09MCxiYXNlTXBhdGhBPXsiL2lob21lL2NyYy9tb2R1bGVzL0NvcmUiLH0sWyJjX3JlYnVpbGRUaW1lIl09ODY0MDAsWyJjX3Nob3J0VGltZSJdPTYxLjA5OTMzOTk2MjAwNixmYW1pbHk9e30saW5hY3RpdmU9e30sbVQ9e30sbXBhdGhBPXsiL2lob21lL2NyYy9tb2R1bGVzL0NvcmUiLH0sWyJzeXN0ZW1CYXNlTVBBVEgiXT0iL2lob21lL2NyYy9tb2R1bGVzL0NvcmUiLFsidmVyc2lvbiJdPTIsfQ=="; export _ModuleTable001_; _ModuleTable_Sz_="1"; export _ModuleTable_Sz_;
+module load cutadapt/2.10
+LMOD_DEFAULT_MODULEPATH="/ihome/crc/modules/Core"; export LMOD_DEFAULT_MODULEPATH; MODULEPATH="/ihome/crc/modules/Core"; export MODULEPATH; LD_LIBRARY_PATH="/ihome/crc/install/cutadapt/2.10/python3.7/lib:/opt/rh/httpd24/root/usr/lib64"; export LD_LIBRARY_PATH; LIBRARY_PATH="/ihome/crc/install/cutadapt/2.10/python3.7/lib"; export LIBRARY_PATH; LMOD_DEFAULT_MODULEPATH="/ihome/crc/modules/Core"; export LMOD_DEFAULT_MODULEPATH; LOADEDMODULES="cutadapt/2.10"; export LOADEDMODULES; MODULEPATH="/ihome/crc/modules/Core"; export MODULEPATH; PATH="/ihome/crc/install/cutadapt/2.10/python3.7/bin:/opt/rh/rh-git227/root/usr/bin:/ihome/mmarazita/til177/.vscode-server/cli/servers/Stable-e249dada235c2083c83813bd65b7f4707fb97b76/server/bin/remote-cli:/ihome/mmarazita/til177/.local/bin:/ihome/mmarazita/til177/bin:/usr/lib64/qt-3.3/bin:/usr/local/bin:/usr/bin:/ihome/crc/pipx/bin:/ihome/crc/pipx/bin:/ihome/crc/pipx/bin"; export PATH; PYTHONPATH="/ihome/crc/install/cutadapt/2.10/python3.7"; export PYTHONPATH; _LMFILES_="/ihome/crc/modules/Core/cutadapt/2.10.lua"; export _LMFILES_; _ModuleTable001_="X01vZHVsZVRhYmxlXz17WyJhY3RpdmVTaXplIl09MSxiYXNlTXBhdGhBPXsiL2lob21lL2NyYy9tb2R1bGVzL0NvcmUiLH0sWyJjX3JlYnVpbGRUaW1lIl09ODY0MDAsWyJjX3Nob3J0VGltZSJdPTYxLjA5OTMzOTk2MjAwNixmYW1pbHk9e30saW5hY3RpdmU9e30sbVQ9e2N1dGFkYXB0PXtbIkZOIl09Ii9paG9tZS9jcmMvbW9kdWxlcy9Db3JlL2N1dGFkYXB0LzIuMTAubHVhIixbImRlZmF1bHQiXT0wLFsiZnVsbE5hbWUiXT0iY3V0YWRhcHQvMi4xMCIsWyJsb2FkT3JkZXIiXT0xLHByb3BUPXt9LFsic2hvcnQiXT0iY3V0YWRhcHQiLFsic3RhdHVzIl09ImFjdGl2ZSIsfSx9LG1wYXRoQT17Ii9paG9tZS9jcmMvbW9kdWxlcy9Db3JlIix9LFsic3lzdGVtQmFzZU1QQVRIIl09"; export _ModuleTable001_; _ModuleTable002_="Ii9paG9tZS9jcmMvbW9kdWxlcy9Db3JlIixbInZlcnNpb24iXT0yLH0="; export _ModuleTable002_; _ModuleTable_Sz_="2"; export _ModuleTable_Sz_;
+# Load modules for star
+module load fastqc/0.11.7
+LMOD_DEFAULT_MODULEPATH="/ihome/crc/modules/Core"; export LMOD_DEFAULT_MODULEPATH; MODULEPATH="/ihome/crc/modules/Core"; export MODULEPATH; CPATH="/ihome/crc/install/java/jdk1.8.0_181/include"; export CPATH; JAVA_HOME="/ihome/crc/install/java/jdk1.8.0_181"; export JAVA_HOME; JAVA_ROOT="/ihome/crc/modules/Compiler/java/1.8.0_181"; export JAVA_ROOT; JRE_HOME="/ihome/crc/install/java/jdk1.8.0_181/jre"; export JRE_HOME; LD_LIBRARY_PATH="/ihome/crc/install/java/jdk1.8.0_181/lib:/ihome/crc/install/java/jdk1.8.0_181/jre/lib:/ihome/crc/install/cutadapt/2.10/python3.7/lib:/opt/rh/httpd24/root/usr/lib64"; export LD_LIBRARY_PATH; LD_RUN_PATH="/ihome/crc/install/java/jdk1.8.0_181/lib:/ihome/crc/install/java/jdk1.8.0_181/jre/lib"; export LD_RUN_PATH; LIBRARY_PATH="/ihome/crc/install/java/jdk1.8.0_181/lib:/ihome/crc/install/java/jdk1.8.0_181/jre/lib:/ihome/crc/install/cutadapt/2.10/python3.7/lib"; export LIBRARY_PATH; LMOD_DEFAULT_MODULEPATH="/ihome/crc/modules/Core"; export LMOD_DEFAULT_MODULEPATH; LOADEDMODULES="cutadapt/2.10:java/1.8.0_181-oracle:fastqc/0.11.7"; export LOADEDMODULES; MANPATH="/ihome/crc/install/java/jdk1.8.0_181/man:/opt/rh/rh-git227/root/usr/share/man:/ihome/crc/install/lmod/lmod/share/man::"; export MANPATH; MODULEPATH="/ihome/crc/modules/Compiler/java/1.8.0_181:/ihome/crc/modules/Core"; export MODULEPATH; PATH="/ihome/crc/install/fastqc/FastQC_v0.11.7/FastQC:/ihome/crc/install/java/jdk1.8.0_181/bin:/ihome/crc/install/java/jdk1.8.0_181/jre/bin:/ihome/crc/install/cutadapt/2.10/python3.7/bin:/opt/rh/rh-git227/root/usr/bin:/ihome/mmarazita/til177/.vscode-server/cli/servers/Stable-e249dada235c2083c83813bd65b7f4707fb97b76/server/bin/remote-cli:/ihome/mmarazita/til177/.local/bin:/ihome/mmarazita/til177/bin:/usr/lib64/qt-3.3/bin:/usr/local/bin:/usr/bin:/ihome/crc/pipx/bin:/ihome/crc/pipx/bin:/ihome/crc/pipx/bin"; export PATH; _LMFILES_="/ihome/crc/modules/Core/cutadapt/2.10.lua:/ihome/crc/modules/Core/java/1.8.0_181-oracle.lua:/ihome/crc/modules/Core/fastqc/0.11.7.lua"; export _LMFILES_; _ModuleTable001_="X01vZHVsZVRhYmxlXz17WyJhY3RpdmVTaXplIl09MyxiYXNlTXBhdGhBPXsiL2lob21lL2NyYy9tb2R1bGVzL0NvcmUiLH0sWyJjX3JlYnVpbGRUaW1lIl09ODY0MDAsWyJjX3Nob3J0VGltZSJdPTYxLjA5OTMzOTk2MjAwNixmYW1pbHk9e30saW5hY3RpdmU9e30sbVQ9e2N1dGFkYXB0PXtbIkZOIl09Ii9paG9tZS9jcmMvbW9kdWxlcy9Db3JlL2N1dGFkYXB0LzIuMTAubHVhIixbImRlZmF1bHQiXT0wLFsiZnVsbE5hbWUiXT0iY3V0YWRhcHQvMi4xMCIsWyJsb2FkT3JkZXIiXT0xLHByb3BUPXt9LFsic2hvcnQiXT0iY3V0YWRhcHQiLFsic3RhdHVzIl09ImFjdGl2ZSIsfSxmYXN0cWM9e1siRk4iXT0iL2lob21lL2NyYy9tb2R1bGVzL0NvcmUvZmFzdHFjLzAuMTEuNy5sdWEi"; export _ModuleTable001_; _ModuleTable002_="LFsiZGVmYXVsdCJdPTAsWyJmdWxsTmFtZSJdPSJmYXN0cWMvMC4xMS43IixbImxvYWRPcmRlciJdPTMscHJvcFQ9e30sWyJzaG9ydCJdPSJmYXN0cWMiLFsic3RhdHVzIl09ImFjdGl2ZSIsfSxqYXZhPXtbIkZOIl09Ii9paG9tZS9jcmMvbW9kdWxlcy9Db3JlL2phdmEvMS44LjBfMTgxLW9yYWNsZS5sdWEiLFsiZGVmYXVsdCJdPTAsWyJmdWxsTmFtZSJdPSJqYXZhLzEuOC4wXzE4MS1vcmFjbGUiLFsibG9hZE9yZGVyIl09Mixwcm9wVD17fSxbInNob3J0Il09ImphdmEiLFsic3RhdHVzIl09ImFjdGl2ZSIsfSx9LG1wYXRoQT17Ii9paG9tZS9jcmMvbW9kdWxlcy9Db21waWxlci9qYXZhLzEuOC4wXzE4MSIsIi9paG9tZS9jcmMvbW9kdWxlcy9Db3JlIix9LFsic3lzdGVtQmFz"; export _ModuleTable002_; _ModuleTable003_="ZU1QQVRIIl09Ii9paG9tZS9jcmMvbW9kdWxlcy9Db3JlIixbInZlcnNpb24iXT0yLH0="; export _ModuleTable003_; _ModuleTable_Sz_="3"; export _ModuleTable_Sz_; __LMOD_STACK_JAVA_HOME="L2lob21lL2NyYy9pbnN0YWxsL2phdmEvamRrMS44LjBfMTgx"; export __LMOD_STACK_JAVA_HOME; __LMOD_STACK_JAVA_ROOT="L2lob21lL2NyYy9tb2R1bGVzL0NvbXBpbGVyL2phdmEvMS44LjBfMTgx"; export __LMOD_STACK_JAVA_ROOT; __LMOD_STACK_JRE_HOME="L2lob21lL2NyYy9pbnN0YWxsL2phdmEvamRrMS44LjBfMTgxL2pyZQ=="; export __LMOD_STACK_JRE_HOME;
+module load star/2.7.5a
+LMOD_DEFAULT_MODULEPATH="/ihome/crc/modules/Core"; export LMOD_DEFAULT_MODULEPATH; MODULEPATH="/ihome/crc/modules/Compiler/java/1.8.0_181:/ihome/crc/modules/Core"; export MODULEPATH; LMOD_DEFAULT_MODULEPATH="/ihome/crc/modules/Core"; export LMOD_DEFAULT_MODULEPATH; LOADEDMODULES="cutadapt/2.10:java/1.8.0_181-oracle:fastqc/0.11.7:star/2.7.5a"; export LOADEDMODULES; MODULEPATH="/ihome/crc/modules/Compiler/java/1.8.0_181:/ihome/crc/modules/Core"; export MODULEPATH; PATH="/ihome/crc/install/star/STAR-2.7.5a/bin/Linux_x86_64_static:/ihome/crc/install/fastqc/FastQC_v0.11.7/FastQC:/ihome/crc/install/java/jdk1.8.0_181/bin:/ihome/crc/install/java/jdk1.8.0_181/jre/bin:/ihome/crc/install/cutadapt/2.10/python3.7/bin:/opt/rh/rh-git227/root/usr/bin:/ihome/mmarazita/til177/.vscode-server/cli/servers/Stable-e249dada235c2083c83813bd65b7f4707fb97b76/server/bin/remote-cli:/ihome/mmarazita/til177/.local/bin:/ihome/mmarazita/til177/bin:/usr/lib64/qt-3.3/bin:/usr/local/bin:/usr/bin:/ihome/crc/pipx/bin:/ihome/crc/pipx/bin:/ihome/crc/pipx/bin"; export PATH; _LMFILES_="/ihome/crc/modules/Core/cutadapt/2.10.lua:/ihome/crc/modules/Core/java/1.8.0_181-oracle.lua:/ihome/crc/modules/Core/fastqc/0.11.7.lua:/ihome/crc/modules/Core/star/2.7.5a.lua"; export _LMFILES_; _ModuleTable001_="X01vZHVsZVRhYmxlXz17WyJhY3RpdmVTaXplIl09NCxiYXNlTXBhdGhBPXsiL2lob21lL2NyYy9tb2R1bGVzL0NvcmUiLH0sWyJjX3JlYnVpbGRUaW1lIl09ODY0MDAsWyJjX3Nob3J0VGltZSJdPTYxLjA5OTMzOTk2MjAwNixmYW1pbHk9e30saW5hY3RpdmU9e30sbVQ9e2N1dGFkYXB0PXtbIkZOIl09Ii9paG9tZS9jcmMvbW9kdWxlcy9Db3JlL2N1dGFkYXB0LzIuMTAubHVhIixbImRlZmF1bHQiXT0wLFsiZnVsbE5hbWUiXT0iY3V0YWRhcHQvMi4xMCIsWyJsb2FkT3JkZXIiXT0xLHByb3BUPXt9LFsic2hvcnQiXT0iY3V0YWRhcHQiLFsic3RhdHVzIl09ImFjdGl2ZSIsfSxmYXN0cWM9e1siRk4iXT0iL2lob21lL2NyYy9tb2R1bGVzL0NvcmUvZmFzdHFjLzAuMTEuNy5sdWEi"; export _ModuleTable001_; _ModuleTable002_="LFsiZGVmYXVsdCJdPTAsWyJmdWxsTmFtZSJdPSJmYXN0cWMvMC4xMS43IixbImxvYWRPcmRlciJdPTMscHJvcFQ9e30sWyJzaG9ydCJdPSJmYXN0cWMiLFsic3RhdHVzIl09ImFjdGl2ZSIsfSxqYXZhPXtbIkZOIl09Ii9paG9tZS9jcmMvbW9kdWxlcy9Db3JlL2phdmEvMS44LjBfMTgxLW9yYWNsZS5sdWEiLFsiZGVmYXVsdCJdPTAsWyJmdWxsTmFtZSJdPSJqYXZhLzEuOC4wXzE4MS1vcmFjbGUiLFsibG9hZE9yZGVyIl09Mixwcm9wVD17fSxbInNob3J0Il09ImphdmEiLFsic3RhdHVzIl09ImFjdGl2ZSIsfSxzdGFyPXtbIkZOIl09Ii9paG9tZS9jcmMvbW9kdWxlcy9Db3JlL3N0YXIvMi43LjVhLmx1YSIsWyJkZWZhdWx0Il09MCxbImZ1bGxOYW1lIl09InN0YXIvMi43LjVh"; export _ModuleTable002_; _ModuleTable003_="IixbImxvYWRPcmRlciJdPTQscHJvcFQ9e30sWyJzaG9ydCJdPSJzdGFyIixbInN0YXR1cyJdPSJhY3RpdmUiLH0sfSxtcGF0aEE9eyIvaWhvbWUvY3JjL21vZHVsZXMvQ29tcGlsZXIvamF2YS8xLjguMF8xODEiLCIvaWhvbWUvY3JjL21vZHVsZXMvQ29yZSIsfSxbInN5c3RlbUJhc2VNUEFUSCJdPSIvaWhvbWUvY3JjL21vZHVsZXMvQ29yZSIsWyJ2ZXJzaW9uIl09Mix9"; export _ModuleTable003_; _ModuleTable_Sz_="3"; export _ModuleTable_Sz_;
+module load gcc/9.2.0
+LMOD_DEFAULT_MODULEPATH="/ihome/crc/modules/Core"; export LMOD_DEFAULT_MODULEPATH; MODULEPATH="/ihome/crc/modules/Compiler/java/1.8.0_181:/ihome/crc/modules/Core"; export MODULEPATH; CPATH="/ihome/crc/install/gcc/9.2.0/lib/gcc/x86_64-pc-linux-gnu/9.2.0/include:/ihome/crc/install/gcc/9.2.0/include:/ihome/crc/install/java/jdk1.8.0_181/include"; export CPATH; GCC_ROOT="/ihome/crc/install/gcc/9.2.0"; export GCC_ROOT; INCLUDE_PATH="/ihome/crc/install/gcc/9.2.0/lib/gcc/x86_64-pc-linux-gnu/9.2.0/include:/ihome/crc/install/gcc/9.2.0/include"; export INCLUDE_PATH; LD_LIBRARY_PATH="/ihome/crc/install/gcc/9.2.0/lib/gcc/x86_64-pc-linux-gnu/9.2.0:/ihome/crc/install/gcc/9.2.0/lib64:/ihome/crc/install/java/jdk1.8.0_181/lib:/ihome/crc/install/java/jdk1.8.0_181/jre/lib:/ihome/crc/install/cutadapt/2.10/python3.7/lib:/opt/rh/httpd24/root/usr/lib64"; export LD_LIBRARY_PATH; LD_RUN_PATH="/ihome/crc/install/gcc/9.2.0/lib64:/ihome/crc/install/java/jdk1.8.0_181/lib:/ihome/crc/install/java/jdk1.8.0_181/jre/lib"; export LD_RUN_PATH; LIBPATH="/ihome/crc/install/gcc/9.2.0/lib/gcc/x86_64-pc-linux-gnu/9.2.0"; export LIBPATH; LIBRARY_PATH="/ihome/crc/install/gcc/9.2.0/lib/gcc/x86_64-pc-linux-gnu/9.2.0:/ihome/crc/install/gcc/9.2.0/lib64:/ihome/crc/install/java/jdk1.8.0_181/lib:/ihome/crc/install/java/jdk1.8.0_181/jre/lib:/ihome/crc/install/cutadapt/2.10/python3.7/lib"; export LIBRARY_PATH; LMOD_DEFAULT_MODULEPATH="/ihome/crc/modules/Core"; export LMOD_DEFAULT_MODULEPATH; LOADEDMODULES="cutadapt/2.10:java/1.8.0_181-oracle:fastqc/0.11.7:star/2.7.5a:gcc/9.2.0"; export LOADEDMODULES; MANPATH="/ihome/crc/install/gcc/9.2.0/share/man:/ihome/crc/install/java/jdk1.8.0_181/man:/opt/rh/rh-git227/root/usr/share/man:/ihome/crc/install/lmod/lmod/share/man::"; export MANPATH; MODULEPATH="/ihome/crc/modules/Compiler/gcc/9.2.0:/ihome/crc/modules/Compiler/java/1.8.0_181:/ihome/crc/modules/Core"; export MODULEPATH; PATH="/ihome/crc/install/gcc/9.2.0/bin:/ihome/crc/install/star/STAR-2.7.5a/bin/Linux_x86_64_static:/ihome/crc/install/fastqc/FastQC_v0.11.7/FastQC:/ihome/crc/install/java/jdk1.8.0_181/bin:/ihome/crc/install/java/jdk1.8.0_181/jre/bin:/ihome/crc/install/cutadapt/2.10/python3.7/bin:/opt/rh/rh-git227/root/usr/bin:/ihome/mmarazita/til177/.vscode-server/cli/servers/Stable-e249dada235c2083c83813bd65b7f4707fb97b76/server/bin/remote-cli:/ihome/mmarazita/til177/.local/bin:/ihome/mmarazita/til177/bin:/usr/lib64/qt-3.3/bin:/usr/local/bin:/usr/bin:/ihome/crc/pipx/bin:/ihome/crc/pipx/bin:/ihome/crc/pipx/bin"; export PATH; _LMFILES_="/ihome/crc/modules/Core/cutadapt/2.10.lua:/ihome/crc/modules/Core/java/1.8.0_181-oracle.lua:/ihome/crc/modules/Core/fastqc/0.11.7.lua:/ihome/crc/modules/Core/star/2.7.5a.lua:/ihome/crc/modules/Core/gcc/9.2.0.lua"; export _LMFILES_; _ModuleTable001_="X01vZHVsZVRhYmxlXz17WyJhY3RpdmVTaXplIl09NSxiYXNlTXBhdGhBPXsiL2lob21lL2NyYy9tb2R1bGVzL0NvcmUiLH0sWyJjX3JlYnVpbGRUaW1lIl09ODY0MDAsWyJjX3Nob3J0VGltZSJdPTYxLjA5OTMzOTk2MjAwNixmYW1pbHk9e30saW5hY3RpdmU9e30sbVQ9e2N1dGFkYXB0PXtbIkZOIl09Ii9paG9tZS9jcmMvbW9kdWxlcy9Db3JlL2N1dGFkYXB0LzIuMTAubHVhIixbImRlZmF1bHQiXT0wLFsiZnVsbE5hbWUiXT0iY3V0YWRhcHQvMi4xMCIsWyJsb2FkT3JkZXIiXT0xLHByb3BUPXt9LFsic2hvcnQiXT0iY3V0YWRhcHQiLFsic3RhdHVzIl09ImFjdGl2ZSIsfSxmYXN0cWM9e1siRk4iXT0iL2lob21lL2NyYy9tb2R1bGVzL0NvcmUvZmFzdHFjLzAuMTEuNy5sdWEi"; export _ModuleTable001_; _ModuleTable002_="LFsiZGVmYXVsdCJdPTAsWyJmdWxsTmFtZSJdPSJmYXN0cWMvMC4xMS43IixbImxvYWRPcmRlciJdPTMscHJvcFQ9e30sWyJzaG9ydCJdPSJmYXN0cWMiLFsic3RhdHVzIl09ImFjdGl2ZSIsfSxnY2M9e1siRk4iXT0iL2lob21lL2NyYy9tb2R1bGVzL0NvcmUvZ2NjLzkuMi4wLmx1YSIsWyJkZWZhdWx0Il09MCxbImZ1bGxOYW1lIl09ImdjYy85LjIuMCIsWyJsb2FkT3JkZXIiXT01LHByb3BUPXt9LFsic2hvcnQiXT0iZ2NjIixbInN0YXR1cyJdPSJhY3RpdmUiLH0samF2YT17WyJGTiJdPSIvaWhvbWUvY3JjL21vZHVsZXMvQ29yZS9qYXZhLzEuOC4wXzE4MS1vcmFjbGUubHVhIixbImRlZmF1bHQiXT0wLFsiZnVsbE5hbWUiXT0iamF2YS8xLjguMF8xODEtb3JhY2xlIixbImxv"; export _ModuleTable002_; _ModuleTable003_="YWRPcmRlciJdPTIscHJvcFQ9e30sWyJzaG9ydCJdPSJqYXZhIixbInN0YXR1cyJdPSJhY3RpdmUiLH0sc3Rhcj17WyJGTiJdPSIvaWhvbWUvY3JjL21vZHVsZXMvQ29yZS9zdGFyLzIuNy41YS5sdWEiLFsiZGVmYXVsdCJdPTAsWyJmdWxsTmFtZSJdPSJzdGFyLzIuNy41YSIsWyJsb2FkT3JkZXIiXT00LHByb3BUPXt9LFsic2hvcnQiXT0ic3RhciIsWyJzdGF0dXMiXT0iYWN0aXZlIix9LH0sbXBhdGhBPXsiL2lob21lL2NyYy9tb2R1bGVzL0NvbXBpbGVyL2djYy85LjIuMCIsIi9paG9tZS9jcmMvbW9kdWxlcy9Db21waWxlci9qYXZhLzEuOC4wXzE4MSIsIi9paG9tZS9jcmMvbW9kdWxlcy9Db3JlIix9LFsic3lzdGVtQmFzZU1QQVRIIl09Ii9paG9tZS9jcmMvbW9kdWxlcy9D"; export _ModuleTable003_; _ModuleTable004_="b3JlIixbInZlcnNpb24iXT0yLH0="; export _ModuleTable004_; _ModuleTable_Sz_="4"; export _ModuleTable_Sz_;
+
+
+######## 0. Setup ArrayJobs ########
+exp=$(awk -v lineNumb=$(($SLURM_ARRAY_TASK_ID+1)) 'NR==lineNumb { print $0 }' ls_exp.txt)
+
+## for output file names
+exp_prefix=$(echo $exp | sed 's/_ERCC.*//')
+
+## add read{1,2} as input
+#       .read1.fastq.gz
+#       .read2.fastq.gz
+exp_read1="${exp}.read1.fastq.gz"
+exp_read2="${exp}.read2.fastq.gz"
+
+
+echo "Job for Experiment *** ${exp_prefix} *** started at: $(date)"
+Job for Experiment *** UHR_Rep1 *** started at: Thu Apr 24 23:01:35 EDT 2025
+
+echo $exp_read1
+UHR_Rep1_ERCC-Mix1_Build37-ErccTranscripts-chr22.read1.fastq.gz
+
+echo $exp_read2
+UHR_Rep1_ERCC-Mix1_Build37-ErccTranscripts-chr22.read2.fastq.gz
+
+
+######## 1. Use cutadapt to trim adapter sequence ########
+
+# Right now the script is set up to take in HBR_Rep1_ERCC-Mix2_Build37-ErccTranscripts-chr22.read1.fastq.gz
+# 	and HBR_Rep1_ERCC-Mix2_Build37-ErccTranscripts-chr22.read2.fastq.gz
+#   and it is set to output in HBR_Rep1.trimmed.R1.fastq.gz and HBR_Rep1.trimmed.R2.fastq.gz
+# You need to change the input for each run (directory stays the same)
+# You need to change the output file name for each run (use the output file names given in the assignment instructions)
+# (You need to change the output file directory from blah/blah/blah/project5/ to a folder of yours; make sure the folder exists)
+
+mkdir -p ../output/1_cutadapt
+
+# -a/-A: Universal Illumina adapters (3')
+# -o/-p: OUTPUT (first/second)
+cutadapt -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT \
+         -o ../output/1_cutadapt/${exp_prefix}.trimmed.R1.fastq.gz -p ../output/1_cutadapt/${exp_prefix}.trimmed.R2.fastq.gz \
+         ../p7/${exp_read1} ../p7/${exp_read2}
+This is cutadapt 2.10 with Python 3.7.6
+Command line parameters: -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT -o ../output/1_cutadapt/UHR_Rep1.trimmed.R1.fastq.gz -p ../output/1_cutadapt/UHR_Rep1.trimmed.R2.fastq.gz ../p7/UHR_Rep1_ERCC-Mix1_Build37-ErccTranscripts-chr22.read1.fastq.gz ../p7/UHR_Rep1_ERCC-Mix1_Build37-ErccTranscripts-chr22.read2.fastq.gz
+Processing reads on 1 core in paired-end mode ...
+Finished in 10.89 s (48 us/read; 1.25 M reads/minute).
+
+=== Summary ===
+
+Total read pairs processed:            227,392
+  Read 1 with adapter:                   3,683 (1.6%)
+  Read 2 with adapter:                   5,979 (2.6%)
+Pairs written (passing filters):       227,392 (100.0%)
+
+Total basepairs processed:    45,478,400 bp
+  Read 1:    22,739,200 bp
+  Read 2:    22,739,200 bp
+Total written (filtered):     45,446,385 bp (99.9%)
+  Read 1:    22,727,150 bp
+  Read 2:    22,719,235 bp
+
+=== First read: Adapter 1 ===
+
+Sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA; Type: regular 3'; Length: 33; Trimmed: 3683 times
+
+No. of allowed errors:
+0-9 bp: 0; 10-19 bp: 1; 20-29 bp: 2; 30-33 bp: 3
+
+Bases preceding removed adapters:
+  A: 28.9%
+  C: 31.5%
+  G: 25.9%
+  T: 13.7%
+  none/other: 0.0%
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+3	2966	3553.0	0	2966
+4	523	888.2	0	523
+5	164	222.1	0	164
+6	12	55.5	0	12
+8	1	3.5	0	1
+9	10	0.9	0	0 10
+10	7	0.2	1	0 7
+
+
+=== Second read: Adapter 2 ===
+
+Sequence: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT; Type: regular 3'; Length: 33; Trimmed: 5979 times
+
+No. of allowed errors:
+0-9 bp: 0; 10-19 bp: 1; 20-29 bp: 2; 30-33 bp: 3
+
+Bases preceding removed adapters:
+  A: 36.8%
+  C: 25.1%
+  G: 21.2%
+  T: 16.9%
+  none/other: 0.0%
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+3	4443	3553.0	0	4443
+4	1206	888.2	0	1206
+5	244	222.1	0	244
+6	40	55.5	0	40
+7	35	13.9	0	35
+8	2	3.5	0	2
+9	3	0.9	0	0 3
+10	2	0.2	1	0 2
+11	4	0.1	1	0 4
+
+
+######## 2. Aligning the reads ########
+
+# The inputs are the two files you made in the previous step
+# (so remember to update them  each time you run the script)
+# (and change the folder from /blah/blah/blah/project5/ of course)
+# For the --outFileNamePrefix argument, name the file HBR_Rep1, HBR_Rep2, UHR_Rep1, or UHR_Rep2 depending on which step you're on
+# 	also include the path to the folder you're using (i.e., replace /blah/blah/blah/project5)
+# Don't change the --genomeDir argument at all
+
+mkdir -p ../output/2_STAR
+
+STAR --runThreadN 2 \
+    --runMode alignReads \
+    --outSAMstrandField intronMotif \
+    --twopassMode Basic \
+    --readFilesIn ../output/1_cutadapt/${exp_prefix}.trimmed.R1.fastq.gz \
+                  ../output/1_cutadapt/${exp_prefix}.trimmed.R2.fastq.gz \
+    --outFileNamePrefix ../output/2_STAR/${exp_prefix} \
+    --quantMode GeneCounts \
+    --outStd Log \
+    --outWigType bedGraph \
+    --outWigReferencesPrefix ../output/2_STAR/${exp_prefix}_bedgraph \
+    --genomeDir ../p7/STAR_reference/ \
+    --readFilesCommand zcat \
+    --outSAMtype BAM SortedByCoordinate
+Apr 24 23:01:49 ..... started STAR run
+Apr 24 23:01:50 ..... loading genome
+Apr 24 23:06:04 ..... started 1st pass mapping
+Apr 24 23:06:33 ..... finished 1st pass mapping
+Apr 24 23:06:34 ..... inserting junctions into the genome indices
+Apr 24 23:08:05 ..... started mapping
+Apr 24 23:08:33 ..... finished mapping
+Apr 24 23:08:36 ..... started sorting BAM
+Apr 24 23:08:37 ..... started wiggle output
+Apr 24 23:08:37 ..... finished successfully
+
+
+#### Main analysis end ####
+echo "Job for Experiment *** ${exp_prefix} *** ended at: $(date)  on node $HOSTNAME"
+Job for Experiment *** UHR_Rep1 *** ended at: Thu Apr 24 23:08:38 EDT 2025  on node teach-cpu-n1
+

@@ -56,3 +56,8 @@ p05-WGS-analysis/toyRead-hg19/
 p06-SV-calling/output/manta_test
 p06-SV-calling/output/NA*
 p06-SV-calling/p6
+
+## ignore p07 large files
+p07-RNASeq-DE/output/1_cutadapt
+p07-RNASeq-DE/output/2_STAR
+p07-RNASeq-DE/p7

@@ -1,0 +1,349 @@
+> rm(list=ls())
+> 
+> #### 0. Load the packges we need ####
+> # (These should already be installed on the RStudio server for R version 4.0.0)
+> library(edgeR)
+> library(baySeq)
+> library(data.table)
+> 
+> #### 1. Read in the data ####
+> # You need to set the correct path!
+> # Skip the first 4 lines of each (they contain summary information, not expression data)
+> hbr1 <- as.data.frame( fread("../output/2_STAR/HBR_Rep1ReadsPerGene.out.tab", skip=4) )
+> hbr2 <- as.data.frame( fread("../output/2_STAR/HBR_Rep2ReadsPerGene.out.tab", skip=4) )
+> uhr1 <- as.data.frame( fread("../output/2_STAR/UHR_Rep1ReadsPerGene.out.tab", skip=4) )
+> uhr2 <- as.data.frame( fread("../output/2_STAR/UHR_Rep2ReadsPerGene.out.tab", skip=4) )
+> 
+> # Peek at the data
+> #   - There are 6 HBR samples (stored in hbr1 and hbr2)
+> #   - There are 6 UHR samples (stored in uhr1 and uhr2)
+> #   - Each has the same number of rows (60,710 transcripts)
+> #   - The first column has the gene/transcript name
+> #   - Columns 2-4 of each data frame contain the expression levels
+> dim(hbr1)
+[1] 60710     4
+> dim(hbr2)
+[1] 60710     4
+> dim(uhr1)
+[1] 60710     4
+> dim(uhr2)
+[1] 60710     4
+> 
+> head(hbr1)
+                 V1 V2 V3 V4
+1 ENSG00000223972.5  0  0  0
+2 ENSG00000227232.5  0  0  0
+3 ENSG00000278267.1  0  0  0
+4 ENSG00000243485.5  0  0  0
+5 ENSG00000284332.1  0  0  0
+6 ENSG00000237613.2  0  0  0
+> head(hbr2)
+                 V1 V2 V3 V4
+1 ENSG00000223972.5  0  0  0
+2 ENSG00000227232.5  0  0  0
+3 ENSG00000278267.1  0  0  0
+4 ENSG00000243485.5  0  0  0
+5 ENSG00000284332.1  0  0  0
+6 ENSG00000237613.2  0  0  0
+> head(uhr1)
+                 V1 V2 V3 V4
+1 ENSG00000223972.5  0  0  0
+2 ENSG00000227232.5  0  0  0
+3 ENSG00000278267.1  0  0  0
+4 ENSG00000243485.5  0  0  0
+5 ENSG00000284332.1  0  0  0
+6 ENSG00000237613.2  0  0  0
+> head(uhr2)
+                 V1 V2 V3 V4
+1 ENSG00000223972.5  0  0  0
+2 ENSG00000227232.5  0  0  0
+3 ENSG00000278267.1  0  0  0
+4 ENSG00000243485.5  0  0  0
+5 ENSG00000284332.1  0  0  0
+6 ENSG00000237613.2  0  0  0
+> 
+> 
+> #### 2. Combine the count data into 1 data frame ####
+> # We need to put the data all into one matrix before applying the functions we need to apply
+> 
+> # Check that the row names are exactly the same first (they are)
+> all.equal(hbr1$V1, hbr2$V1) # Returns TRUE
+[1] TRUE
+> all.equal(hbr1$V1, uhr1$V1) # Returns TRUE
+[1] TRUE
+> all.equal(hbr1$V1, uhr2$V1) # Returns TRUE
+[1] TRUE
+> 
+> # Column-bind the data, **leaving out the first column of each** (gene names)
+> #   Call the combined data frame expr
+> #   PROVIDE YOUR CODE TO DO THIS!!!
+> #   You should have a gene/transcript per row (60710 rows) and a sample per column (12 samples)
+> 
+> ## hbr first, uhr next
+> expr <- cbind(hbr1[,c(2:4)], 
++               hbr2[,c(2:4)],
++               uhr1[,c(2:4)],
++               uhr2[,c(2:4)])
+> head(expr)
+  V2 V3 V4 V2 V3 V4 V2 V3 V4 V2 V3 V4
+1  0  0  0  0  0  0  0  0  0  0  0  0
+2  0  0  0  0  0  0  0  0  0  0  0  0
+3  0  0  0  0  0  0  0  0  0  0  0  0
+4  0  0  0  0  0  0  0  0  0  0  0  0
+5  0  0  0  0  0  0  0  0  0  0  0  0
+6  0  0  0  0  0  0  0  0  0  0  0  0
+> dim(expr)
+[1] 60710    12
+> 
+> # Convert from data.frame to matrix
+> #   Replace the row names with the transcript names (which are in the right order)
+> #   Get rid of the column names (they're arbitrary and won't be used)
+> expr <- as.matrix(expr)
+> class(expr)
+[1] "matrix" "array" 
+> rownames(expr) <- hbr1$V1
+> colnames(expr) <- NULL
+> ## check format
+> dim(expr)
+[1] 60710    12
+> head(expr)
+                  [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11]
+ENSG00000223972.5    0    0    0    0    0    0    0    0    0     0     0
+ENSG00000227232.5    0    0    0    0    0    0    0    0    0     0     0
+ENSG00000278267.1    0    0    0    0    0    0    0    0    0     0     0
+ENSG00000243485.5    0    0    0    0    0    0    0    0    0     0     0
+ENSG00000284332.1    0    0    0    0    0    0    0    0    0     0     0
+ENSG00000237613.2    0    0    0    0    0    0    0    0    0     0     0
+                  [,12]
+ENSG00000223972.5     0
+ENSG00000227232.5     0
+ENSG00000278267.1     0
+ENSG00000243485.5     0
+ENSG00000284332.1     0
+ENSG00000237613.2     0
+> 
+> #### 3. Recall that the samples come from two groups: HBR and UHR ####
+> #   The first 6 were from HBR, the second 6 from UHR
+> 
+> # Record the samples groups'
+> #   (when we calculate differential expression between the two groups,
+> #   we need to tell the functions which group each sample belongs to)
+> data_groups <- c(rep("hbr",6), rep("uhr",6))
+> data_groups
+ [1] "hbr" "hbr" "hbr" "hbr" "hbr" "hbr" "uhr" "uhr" "uhr" "uhr" "uhr" "uhr"
+> 
+> 
+> #### 4. Create a DGEList object (Differential Gene Expression) from the data ####
+> # Supply the matrix of transcript counts per gene/sample & the group labels for the samples
+> #   The DGEList will be used as input for the differential expression calculation functions
+> #   See ?DGEList for details
+> d <- DGEList(counts=expr, group=factor(data_groups))
+> d
+An object of class "DGEList"
+$counts
+                  Sample1 Sample2 Sample3 Sample4 Sample5 Sample6 Sample7
+ENSG00000223972.5       0       0       0       0       0       0       0
+ENSG00000227232.5       0       0       0       0       0       0       0
+ENSG00000278267.1       0       0       0       0       0       0       0
+ENSG00000243485.5       0       0       0       0       0       0       0
+ENSG00000284332.1       0       0       0       0       0       0       0
+                  Sample8 Sample9 Sample10 Sample11 Sample12
+ENSG00000223972.5       0       0        0        0        0
+ENSG00000227232.5       0       0        0        0        0
+ENSG00000278267.1       0       0        0        0        0
+ENSG00000243485.5       0       0        0        0        0
+ENSG00000284332.1       0       0        0        0        0
+60705 more rows ...
+
+$samples
+        group lib.size norm.factors
+Sample1   hbr    37357            1
+Sample2   hbr     3275            1
+Sample3   hbr    38242            1
+Sample4   hbr    45971            1
+Sample5   hbr     4047            1
+7 more rows ...
+
+> dim(d)
+[1] 60710    12
+> 
+> #### 5. Look at and filter the data first ####
+> # Use the cpm (counts per million) function to normalize the transcript counts
+> head(d$counts)
+                  Sample1 Sample2 Sample3 Sample4 Sample5 Sample6 Sample7
+ENSG00000223972.5       0       0       0       0       0       0       0
+ENSG00000227232.5       0       0       0       0       0       0       0
+ENSG00000278267.1       0       0       0       0       0       0       0
+ENSG00000243485.5       0       0       0       0       0       0       0
+ENSG00000284332.1       0       0       0       0       0       0       0
+ENSG00000237613.2       0       0       0       0       0       0       0
+                  Sample8 Sample9 Sample10 Sample11 Sample12
+ENSG00000223972.5       0       0        0        0        0
+ENSG00000227232.5       0       0        0        0        0
+ENSG00000278267.1       0       0        0        0        0
+ENSG00000243485.5       0       0        0        0        0
+ENSG00000284332.1       0       0        0        0        0
+ENSG00000237613.2       0       0        0        0        0
+> head(cpm(d))
+                  Sample1 Sample2 Sample3 Sample4 Sample5 Sample6 Sample7
+ENSG00000223972.5       0       0       0       0       0       0       0
+ENSG00000227232.5       0       0       0       0       0       0       0
+ENSG00000278267.1       0       0       0       0       0       0       0
+ENSG00000243485.5       0       0       0       0       0       0       0
+ENSG00000284332.1       0       0       0       0       0       0       0
+ENSG00000237613.2       0       0       0       0       0       0       0
+                  Sample8 Sample9 Sample10 Sample11 Sample12
+ENSG00000223972.5       0       0        0        0        0
+ENSG00000227232.5       0       0        0        0        0
+ENSG00000278267.1       0       0        0        0        0
+ENSG00000243485.5       0       0        0        0        0
+ENSG00000284332.1       0       0        0        0        0
+ENSG00000237613.2       0       0        0        0        0
+> 
+> apply(d$counts, 2, sum) # This calculate the total number of transcript counts per sample
+ Sample1  Sample2  Sample3  Sample4  Sample5  Sample6  Sample7  Sample8 
+   37357     3275    38242    45971     4047    47033    63767     4369 
+ Sample9 Sample10 Sample11 Sample12 
+   65147    42237     3609    42354 
+> keep <- rowSums(cpm(d)>100) >= 2 # This picks out row numbers of genes that are expressed (cpm > 100) in at least 2 samples
+> d <- d[keep,] # **Keep only the genes expressed (cpm > 100) in at least 2 samples**
+> dim(d) # 654 genes are left
+[1] 654  12
+> 
+> d$samples$lib.size <- colSums(d$counts) # Update the "library size" (the total number of transcripts) for each sample
+> d$samples
+         group lib.size norm.factors
+Sample1    hbr    37234            1
+Sample2    hbr     3262            1
+Sample3    hbr    38123            1
+Sample4    hbr    45780            1
+Sample5    hbr     4021            1
+Sample6    hbr    46862            1
+Sample7    uhr    63518            1
+Sample8    uhr     4339            1
+Sample9    uhr    64908            1
+Sample10   uhr    41848            1
+Sample11   uhr     3472            1
+Sample12   uhr    42082            1
+> 
+> #### 6. Normalize the reads and plot them ####
+> # We'll use MDS (multidimensional scaling) to plot the samples based on the similarity of their gene expression profiles
+> # (Think of the MDS plot as analogous to a principal components analysis plot)
+> d <- calcNormFactors(d) # This stores the scaling factors for normalization in d$samples$norm.factors
+> d
+An object of class "DGEList"
+$counts
+                   Sample1 Sample2 Sample3 Sample4 Sample5 Sample6 Sample7
+ENSG00000198062.15       0       0       0       0       0       0       3
+ENSG00000206195.11       3       0       3       1       0       1     107
+ENSG00000271127.2        0       0       0       0       0       0      11
+ENSG00000232775.6        0       0       0       1       1       0       2
+ENSG00000272872.1        1       0       1       1       0       1      22
+                   Sample8 Sample9 Sample10 Sample11 Sample12
+ENSG00000198062.15       0       3        5        1        4
+ENSG00000206195.11       0     107       72        1       71
+ENSG00000271127.2        0      11        1        0        1
+ENSG00000232775.6        2       0        5        5        0
+ENSG00000272872.1        0      22       12        0       12
+649 more rows ...
+
+$samples
+        group lib.size norm.factors
+Sample1   hbr    37234    0.7271597
+Sample2   hbr     3262    2.4586720
+Sample3   hbr    38123    0.7191907
+Sample4   hbr    45780    0.7275449
+Sample5   hbr     4021    2.2131558
+7 more rows ...
+
+> plotMDS(d, method="bcv", col=as.numeric(d$samples$group))
+> legend("bottomleft", as.character(unique(d$samples$group)), col=1:2, pch=20)
+> 
+> #### 7. Estimate and plot dispersion ####
+> # First, plot dispersion (a measure similar to sd/mean) vs log(cpm)
+> #   Since there is a trend in dispersion vs. log(cpm),
+> #   a single dispersion value (red line) doesn't describe all the transcripts very well
+> #   Below we try to find a better fit
+> d1 <- estimateCommonDisp(d, verbose=T)
+Disp = 1.44585 , BCV = 1.2024 
+> names(d1)
+[1] "counts"            "samples"           "common.dispersion"
+[4] "pseudo.counts"     "pseudo.lib.size"   "AveLogCPM"        
+> d1 <- estimateTagwiseDisp(d1)
+> names(d1)
+ [1] "counts"             "samples"            "common.dispersion" 
+ [4] "pseudo.counts"      "pseudo.lib.size"    "AveLogCPM"         
+ [7] "prior.df"           "prior.n"            "tagwise.dispersion"
+[10] "span"              
+> d1 <- estimateCommonDisp(d, verbose=T)
+Disp = 1.44585 , BCV = 1.2024 
+> d1 <- estimateTagwiseDisp(d1)
+> plotBCV(d1)
+> 
+> # Estimate and plot again, using a generalize linear model to get better fit
+> design.mat <- model.matrix(~ 0 + d$samples$group)
+> colnames(design.mat) <- levels(d$samples$group)
+> d2 <- estimateGLMCommonDisp(d,design.mat)
+> d2 <- estimateGLMTrendedDisp(d2,design.mat, method="power")
+> d2 <- estimateGLMTagwiseDisp(d2,design.mat)
+> plotBCV(d2)
+> 
+> 
+> #### Now test for differential expression between the HBR and UHR groups ####
+> # de1 is a one-column matrix with gene names as rownames,
+> #   "-1"=down-regulated; "1"=up-regulated
+> # Extract the names of the DE genes from de1
+> 
+> et12 <- exactTest(d1, pair=c(1,2)) # compare groups 1 and 2 (HBR, UHR)
+> topTags(et12, n=10) # Look at the top 10 DE genes
+Comparison of groups:  uhr-hbr 
+                       logFC    logCPM       PValue          FDR
+ENSG00000185686.18 11.105786 12.402565 5.243387e-09 3.429175e-06
+ENSG00000133454.16  8.517490  9.904674 1.146932e-08 3.750466e-06
+ENSG00000211677.2  11.084370 12.382343 5.950079e-08 1.297117e-05
+ENSG00000280623.1   9.316181 10.666070 1.198342e-07 1.959289e-05
+ENSG00000211666.2   9.212263 10.571262 1.051225e-06 1.375002e-04
+ENSG00000093009.11  6.313044 10.815549 2.383510e-06 2.598026e-04
+ENSG00000100065.15  4.194652  9.896621 1.722401e-05 1.609214e-03
+ENSG00000075218.19  5.276553 10.233131 2.408198e-05 1.968702e-03
+ENSG00000183765.23  3.919278 10.164626 2.931779e-05 1.987271e-03
+ENSG00000100351.17  5.631110  9.131499 3.038641e-05 1.987271e-03
+> de1 <- decideTestsDGE(et12, adjust.method="BH", p.value=0.05) # Find the DE genes;
+> summary(de1) # How many are up- or down-regulated?
+       uhr-hbr
+Down        32
+NotSig     577
+Up          45
+> 
+> #### Plot log(fold change) vs. log(cpm) ####
+> # Significantly differently-expressed genes are shown in red
+> de1tags12 <- rownames(d1)[as.logical(de1)]
+> plotSmear(et12, de.tags=de1tags12)
+> abline(h = c(-2, 2), col = "blue")
+> 
+> 
+> #### Report the list of the differentially expressed genes (DEGs) ####
+> # Get the summary table for: ***ALL DE genes with FDR < 0.05***
+> DEG_fdr_tab = topTags(et12, n = Inf, adjust.method = "BH", p.value = 0.05) #adjusted p-value cutoff
+> 
+> # 77 DEGs
+> nrow(DEG_fdr_tab)
+[1] 77
+> # 32 down + 45 up
+> summary(de1)
+       uhr-hbr
+Down        32
+NotSig     577
+Up          45
+> 
+> #### Output ####
+> library(tidyverse)
+> df_DEG_fdr_tab = rownames_to_column(as.data.frame(DEG_fdr_tab), var = "ENSG")
+> 
+> # 1. summary table
+> write_csv(df_DEG_fdr_tab, file="../output/3_DiffGeneExpr_result/table_DEGs_fdr.csv")
+> # 2. list of DEGs
+> write.table( rownames(DEG_fdr_tab), file="../output/3_DiffGeneExpr_result/ls_DEGs_fdr.txt",
++              quote = FALSE, sep=" ", row.names = FALSE, col.names = FALSE)
+> 
+> 
