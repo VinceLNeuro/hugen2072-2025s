@@ -48,11 +48,13 @@ echo $exp_read2
 
 :::: column  -->
 
-> ls_exp.txt file
-> HBR_Rep1_ERCC-Mix2_Build37-ErccTranscripts-chr22
-> HBR_Rep2_ERCC-Mix2_Build37-ErccTranscripts-chr22
-> UHR_Rep1_ERCC-Mix1_Build37-ErccTranscripts-chr22
-> UHR_Rep2_ERCC-Mix1_Build37-ErccTranscripts-chr22
+```
+> ls_exp.txt
+HBR_Rep1_ERCC-Mix2_Build37-ErccTranscripts-chr22
+HBR_Rep2_ERCC-Mix2_Build37-ErccTranscripts-chr22
+UHR_Rep1_ERCC-Mix1_Build37-ErccTranscripts-chr22
+UHR_Rep2_ERCC-Mix1_Build37-ErccTranscripts-chr22
+```
 
 ```sh
 exp=$(awk -v lineNumb=$(($SLURM_ARRAY_TASK_ID+1)) 'NR==lineNumb { print $0 }' ls_exp.txt)
@@ -353,7 +355,15 @@ Important Notes in the DGE analysis pipeline
 
 <span style="font-size:0.8em">
 
-7. DE analysis __between the HBR and UHR groups__
+7. DE analysis __between the UHR - HBR__
+
+- **Genewise Exact Test for NB distributed counts between UHR - HBR**
+    - > "so if the pair is c("A","B") then the comparison is B - A, so genes with positive log-fold change are up-regulated in group B compared with group A (and vice versa for genes with negative log-fold change)."
+    - `pair=c(1,2)`: 1 = HBR, 2 = UHR
+    - UHR - HBR
+
+- <mark>We are finding DE genes for UHR/cancer</mark>
+    - 77 DEGs (32 down + 45 up)
 
     ```R
     # compare groups 1 and 2 (HBR, UHR)
@@ -426,6 +436,7 @@ Important Notes in the DGE analysis pipeline
 
 :::: column  -->
 
+UHR - HBR
 <img src="output/3_DiffGeneExpr_result/vol_HBR-UHR.png" width="80%">
 
 <!-- ::::
@@ -434,5 +445,24 @@ Important Notes in the DGE analysis pipeline
 
 - see `output/DiffGeneExpr.log` and `code/Rplots.pdf` for details.
 
+<br>
+
+## 4. Interpretation of DGE analysis
+
+[Based on the description of the experiments](https://github.com/griffithlab/rnaseq_tutorial/wiki/RNAseq-Data), describe the biological function you think the differentially expressed genes should be associated with.
+
+- *Universal Human Reference (UHR)* is total RNA isolated from a diverse set of 10 *cancer cell lines*. 
+
+- *Human Brain Reference (HBR)* is total RNA isolated from the *brains* of 23 Caucasians, male and female, of varying age but *mostly 60-80 years old*.
+
+### My hypothesis (UHR - HBR)
+
+The mRNAs DE in UHR compared to HBR should be enriched in biological pathways involving:
+
+- Positive regulation in metabolism and cell proliferation (or cell cycle); 
+
+- Negatively associated with degeneration, cell death, apoptosis, neuronal functions.
+
+### Overrepresentation Test in DAVID (future direction, post conversion to gene symbol)
 
 

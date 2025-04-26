@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>README.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="project-07---rna-seq-for-de">Project 07 - RNA-seq for DE</h1>
+<p><strong>Author</strong>: Tianze (Vincent) Luo <br>
+<strong>Date</strong>: 2025-04-24</p>
+<h2 id="background">Background</h2>
+<ul>
+<li>
+<p>RNA-seq data on a single chromosome in multiple experiments</p>
+</li>
+<li>
+<p>Files: <code>/ix1/hugen2072-2025s/p7/</code></p>
+</li>
+<li>
+<p>Interactive session command: <code>crc-interactive --teach -a hugen2072-2025s -t 4:00:00</code></p>
+</li>
+</ul>
+<br>
+<!-- # Pipeline - RNA-seq Alignment & DE -->
+<h2 id="0-setup-jobarray-based-on-experiments">0. Setup JobArray Based on Experiments</h2>
+<!-- ::: columns
+
+:::: column -->
+<pre class="hljs"><code><div><span class="hljs-comment">######## 0. Setup ArrayJobs ########</span>
+exp=$(awk -v lineNumb=$((<span class="hljs-variable">$SLURM_ARRAY_TASK_ID</span>+1)) <span class="hljs-string">'NR==lineNumb { print $0 }'</span> ls_exp.txt)
+
+<span class="hljs-comment">## for output file names</span>
+exp_prefix=$(<span class="hljs-built_in">echo</span> <span class="hljs-variable">$exp</span> | sed <span class="hljs-string">'s/_ERCC.*//'</span>)
+
+<span class="hljs-comment">## add read{1,2} as input</span>
+<span class="hljs-comment">#       .read1.fastq.gz</span>
+<span class="hljs-comment">#       .read2.fastq.gz</span>
+exp_read1=<span class="hljs-string">"<span class="hljs-variable">${exp}</span>.read1.fastq.gz"</span>
+exp_read2=<span class="hljs-string">"<span class="hljs-variable">${exp}</span>.read2.fastq.gz"</span>
+
+
+<span class="hljs-built_in">echo</span> <span class="hljs-string">"Job for Experiment *** <span class="hljs-variable">${exp_prefix}</span> *** started at: <span class="hljs-variable">$(date)</span>"</span>
+
+<span class="hljs-built_in">echo</span> <span class="hljs-variable">$exp_read1</span>
+
+<span class="hljs-built_in">echo</span> <span class="hljs-variable">$exp_read2</span>
+
+</div></code></pre>
+<!-- ::::
+
+:::: column  -->
+<pre class="hljs"><code><div>&gt; ls_exp.txt
+HBR_Rep1_ERCC-Mix2_Build37-ErccTranscripts-chr22
+HBR_Rep2_ERCC-Mix2_Build37-ErccTranscripts-chr22
+UHR_Rep1_ERCC-Mix1_Build37-ErccTranscripts-chr22
+UHR_Rep2_ERCC-Mix1_Build37-ErccTranscripts-chr22
+</div></code></pre>
+<pre class="hljs"><code><div>exp=$(awk -v lineNumb=$((<span class="hljs-variable">$SLURM_ARRAY_TASK_ID</span>+1)) <span class="hljs-string">'NR==lineNumb { print $0 }'</span> ls_exp.txt)
+<span class="hljs-comment"># $SLURM_ARRAY_TASK_ID = 0 --&gt; line 1</span>
+<span class="hljs-comment"># $SLURM_ARRAY_TASK_ID = 1 --&gt; line 2</span>
+<span class="hljs-comment"># $SLURM_ARRAY_TASK_ID = 2 --&gt; ...</span>
+<span class="hljs-comment"># $SLURM_ARRAY_TASK_ID = 3 --&gt; ...</span>
+
+<span class="hljs-comment"># Allows correspondance of jobarray ID to experiments</span>
+
+<span class="hljs-built_in">echo</span> <span class="hljs-string">"Job for Experiment *** <span class="hljs-variable">${exp_prefix}</span> *** started at: <span class="hljs-variable">$(date)</span>"</span>
+<span class="hljs-comment"># Job for Experiment *** HBR_Rep1 *** started at: Thu Apr 24 23:01:35 EDT 2025</span>
+
+<span class="hljs-built_in">echo</span> <span class="hljs-variable">$exp_read1</span>
+<span class="hljs-comment"># HBR_Rep1_ERCC-Mix2_Build37-ErccTranscripts-chr22.read1.fastq.gz</span>
+
+<span class="hljs-built_in">echo</span> <span class="hljs-variable">$exp_read2</span>
+<span class="hljs-comment"># HBR_Rep1_ERCC-Mix2_Build37-ErccTranscripts-chr22.read2.fastq.gz</span>
+</div></code></pre>
+<!-- ::::
+
+::: -->
+<h2 id="1-cutadapt-trim-adapter-sequence">1. <code>cutadapt</code>: trim adapter sequence</h2>
+<pre class="hljs"><code><div>mkdir -p ../output/1_cutadapt
+
+<span class="hljs-comment"># -a/-A: Universal Illumina adapters (3')</span>
+<span class="hljs-comment"># -o/-p: OUTPUT (first/second)</span>
+cutadapt -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT \
+         -o ../output/1_cutadapt/<span class="hljs-variable">${exp_prefix}</span>.trimmed.R1.fastq.gz -p ../output/1_cutadapt/<span class="hljs-variable">${exp_prefix}</span>.trimmed.R2.fastq.gz \
+         ../p7/<span class="hljs-variable">${exp_read1}</span> ../p7/<span class="hljs-variable">${exp_read2}</span>
+         
+         <span class="hljs-comment"># Example</span>
+         <span class="hljs-comment"># input: ../p7/HBR_Rep1_ERCC-Mix2_Build37-ErccTranscripts-chr22.read{1,2}.fastq.gz</span>
+
+         <span class="hljs-comment"># output: -o ../output/1_cutadapt/HBR_Rep1.trimmed.R1.fastq.gz</span>
+</div></code></pre>
+<br>
+<h2 id="2-star-aligning-the-reads">2. <code>STAR</code>: Aligning the reads</h2>
+<pre class="hljs"><code><div>mkdir -p ../output/2_STAR
+
+STAR --runThreadN 2 \ 
+    --runMode alignReads \              <span class="hljs-comment"># map reads</span>
+    --outSAMstrandField intronMotif \   <span class="hljs-comment"># strand derived from the intron motif. reads with inconsistent and/or non-canonical introns are filtered out.</span>
+    --twopassMode Basic \ 
+    --readFilesIn ../output/1_cutadapt/<span class="hljs-variable">${exp_prefix}</span>.trimmed.R1.fastq.gz \ 
+                  ../output/1_cutadapt/<span class="hljs-variable">${exp_prefix}</span>.trimmed.R2.fastq.gz \ 
+    --outFileNamePrefix ../output/2_STAR/<span class="hljs-variable">${exp_prefix}</span> \    <span class="hljs-comment"># ../output/2_STAR/HBR_Rep1</span>
+    --quantMode GeneCounts \    <span class="hljs-comment"># only count matrix; No output SAM/BAM alignments</span>
+    --outStd Log \              <span class="hljs-comment"># which output will be directed to stdout (standard out) -- only log</span>
+    --outWigType bedGraph \ 
+    --outWigReferencesPrefix ../output/2_STAR/<span class="hljs-variable">${exp_prefix}</span>_bedgraph \ 
+    --genomeDir ../p7/STAR_reference/ \  <span class="hljs-comment"># where genome indices where generated (pre-generated)</span>
+    --readFilesCommand zcat \   <span class="hljs-comment"># zcat - to uncompress .gz files</span>
+    --outSAMtype BAM SortedByCoordinate  <span class="hljs-comment"># similar to samtools sort command.</span>
+</div></code></pre>
+<!-- ## 2. `STAR`: Aligning the reads (cont.) -->
+<ul>
+<li>Perform downstream analysis using <code>*ReadsPerGene.out.tab</code></li>
+</ul>
+<pre class="hljs"><code><div>[til177@teach-cpu-n0 2_STAR]$ ll *ReadsPerGene.out.tab
+<span class="hljs-comment"># -rw-r--r-- 1 til177 mmarazita 1.5M Apr 24 23:08 HBR_Rep1ReadsPerGene.out.tab</span>
+<span class="hljs-comment"># -rw-r--r-- 1 til177 mmarazita 1.5M Apr 24 23:08 HBR_Rep2ReadsPerGene.out.tab</span>
+<span class="hljs-comment"># -rw-r--r-- 1 til177 mmarazita 1.5M Apr 24 23:08 UHR_Rep1ReadsPerGene.out.tab</span>
+<span class="hljs-comment"># -rw-r--r-- 1 til177 mmarazita 1.5M Apr 24 23:08 UHR_Rep2ReadsPerGene.out.tab</span>
+</div></code></pre>
+<br>
+<h2 id="3-dge-analysis-in-r">3. DGE analysis in R</h2>
+<pre class="hljs"><code><div>module load gcc/12.2.0 r/4.4.0
+Rscript --vanilla p07_DE_tvl.R &gt; ../output/DiffGeneExpr.log
+</div></code></pre>
+<p>Important Notes in the DGE analysis pipeline</p>
+<span style="font-size:0.8em">
+<ol>
+<li>
+<p>When we read <code>*ReadsPerGene.out.tab</code> into R, each file has 3 samples</p>
+<pre class="hljs"><code><div>&gt; head(hbr1)
+<span class="hljs-comment">#                  V1 V2 V3 V4</span>
+<span class="hljs-comment"># 1 ENSG00000223972.5  0  0  0</span>
+<span class="hljs-comment"># 2 ENSG00000227232.5  0  0  0</span>
+<span class="hljs-comment"># 3 ENSG00000278267.1  0  0  0</span>
+<span class="hljs-comment"># 4 ENSG00000243485.5  0  0  0</span>
+<span class="hljs-comment"># 5 ENSG00000284332.1  0  0  0</span>
+<span class="hljs-comment"># 6 ENSG00000237613.2  0  0  0</span>
+&gt; head(hbr2)
+<span class="hljs-comment">#                  V1 V2 V3 V4</span>
+<span class="hljs-comment"># 1 ENSG00000223972.5  0  0  0</span>
+<span class="hljs-comment"># 2 ENSG00000227232.5  0  0  0</span>
+<span class="hljs-comment"># 3 ENSG00000278267.1  0  0  0</span>
+<span class="hljs-comment"># 4 ENSG00000243485.5  0  0  0</span>
+<span class="hljs-comment"># 5 ENSG00000284332.1  0  0  0</span>
+<span class="hljs-comment"># 6 ENSG00000237613.2  0  0  0</span>
+<span class="hljs-comment"># ...</span>
+</div></code></pre>
+<ul>
+<li>The first column has the gene/transcript name</li>
+<li>Columns 2-4 of each data frame contain the expression levels</li>
+<li><strong>There are 6 HBR samples (stored in hbr1 and hbr2) &amp; 6 UHR samples (stored in uhr1 and uhr2)</strong></li>
+<li>Each has the same number of rows (60,710 transcripts)</li>
+</ul>
+</li>
+<li>
+<p>Combine the count data into one data.frame (same transcript for each row across experiments) -&gt; matrix</p>
+<pre class="hljs"><code><div><span class="hljs-comment">## hbr first, uhr next</span>
+expr &lt;- cbind(hbr1[,c(<span class="hljs-number">2</span>:<span class="hljs-number">4</span>)], 
+            hbr2[,c(<span class="hljs-number">2</span>:<span class="hljs-number">4</span>)],
+            uhr1[,c(<span class="hljs-number">2</span>:<span class="hljs-number">4</span>)],
+            uhr2[,c(<span class="hljs-number">2</span>:<span class="hljs-number">4</span>)])
+expr &lt;- as.matrix(expr)
+class(expr)
+<span class="hljs-comment"># [1] "matrix" "array" </span>
+rownames(expr) &lt;- hbr1$V1
+colnames(expr) &lt;- <span class="hljs-literal">NULL</span>
+
+dim(expr)
+<span class="hljs-comment"># [1] 60710    12</span>
+&gt; head(expr)
+<span class="hljs-comment">#                   [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11]</span>
+<span class="hljs-comment"># ENSG00000223972.5    0    0    0    0    0    0    0    0    0     0     0</span>
+<span class="hljs-comment"># ENSG00000227232.5    0    0    0    0    0    0    0    0    0     0     0</span>
+<span class="hljs-comment"># ENSG00000278267.1    0    0    0    0    0    0    0    0    0     0     0</span>
+<span class="hljs-comment"># ENSG00000243485.5    0    0    0    0    0    0    0    0    0     0     0</span>
+<span class="hljs-comment"># ENSG00000284332.1    0    0    0    0    0    0    0    0    0     0     0</span>
+<span class="hljs-comment"># ENSG00000237613.2    0    0    0    0    0    0    0    0    0     0     0</span>
+<span class="hljs-comment">#                   [,12]</span>
+<span class="hljs-comment"># ENSG00000223972.5     0</span>
+<span class="hljs-comment"># ENSG00000227232.5     0</span>
+<span class="hljs-comment"># ENSG00000278267.1     0</span>
+<span class="hljs-comment"># ENSG00000243485.5     0</span>
+<span class="hljs-comment"># ENSG00000284332.1     0</span>
+<span class="hljs-comment"># ENSG00000237613.2     0</span>
+</div></code></pre>
+</li>
+</ol>
+</span>
+<!-- ## 3. Important Notes in the DGE analysis pipeline (cont.) -->
+<span style="font-size:0.8em">
+<ol start="3">
+<li>
+<p>Record the group info (required when doing DE analysis), create <code>DGEList</code> object (for normalizations &amp; input into DE analysis)</p>
+<pre class="hljs"><code><div><span class="hljs-comment"># The first 6 were from HBR, the second 6 from UHR</span>
+data_groups &lt;- c(rep(<span class="hljs-string">"hbr"</span>,<span class="hljs-number">6</span>), rep(<span class="hljs-string">"uhr"</span>,<span class="hljs-number">6</span>))
+data_groups
+<span class="hljs-comment">#  [1] "hbr" "hbr" "hbr" "hbr" "hbr" "hbr" "uhr" "uhr" "uhr" "uhr" "uhr" "uhr"</span>
+
+d &lt;- DGEList(counts=expr, group=factor(data_groups))
+d
+<span class="hljs-comment"># An object of class "DGEList"</span>
+<span class="hljs-comment"># $counts</span>
+<span class="hljs-comment">#                   Sample1 Sample2 Sample3 Sample4 Sample5 Sample6 Sample7</span>
+<span class="hljs-comment"># ENSG00000223972.5       0       0       0       0       0       0       0</span>
+<span class="hljs-comment"># ENSG00000227232.5       0       0       0       0       0       0       0</span>
+<span class="hljs-comment"># ENSG00000278267.1       0       0       0       0       0       0       0</span>
+<span class="hljs-comment"># ENSG00000243485.5       0       0       0       0       0       0       0</span>
+<span class="hljs-comment"># ENSG00000284332.1       0       0       0       0       0       0       0</span>
+<span class="hljs-comment">#                   Sample8 Sample9 Sample10 Sample11 Sample12</span>
+<span class="hljs-comment"># ENSG00000223972.5       0       0        0        0        0</span>
+<span class="hljs-comment"># ENSG00000227232.5       0       0        0        0        0</span>
+<span class="hljs-comment"># ENSG00000278267.1       0       0        0        0        0</span>
+<span class="hljs-comment"># ENSG00000243485.5       0       0        0        0        0</span>
+<span class="hljs-comment"># ENSG00000284332.1       0       0        0        0        0</span>
+<span class="hljs-comment"># 60705 more rows ...</span>
+
+<span class="hljs-comment"># $samples</span>
+<span class="hljs-comment">#         group lib.size norm.factors</span>
+<span class="hljs-comment"># Sample1   hbr    37357            1</span>
+<span class="hljs-comment"># Sample2   hbr     3275            1</span>
+<span class="hljs-comment"># Sample3   hbr    38242            1</span>
+<span class="hljs-comment"># Sample4   hbr    45971            1</span>
+<span class="hljs-comment"># Sample5   hbr     4047            1</span>
+<span class="hljs-comment"># 7 more rows ...</span>
+</div></code></pre>
+</li>
+<li>
+<p>Filter the data (filter OUT low-expressed transcripts across samples)</p>
+<pre class="hljs"><code><div><span class="hljs-comment"># cpm transformation -&gt; T/F matrix -&gt; rowSums (per transcript across samples)</span>
+keep &lt;- rowSums(cpm(d)&gt;<span class="hljs-number">100</span>) &gt;= <span class="hljs-number">2</span>    <span class="hljs-comment"># This picks out row numbers of genes that are expressed (cpm &gt; 100) in at least 2 samples</span>
+d &lt;- d[keep,]                       <span class="hljs-comment"># **Keep only the genes expressed (cpm &gt; 100) in at least 2 samples**</span>
+dim(d) <span class="hljs-comment"># 654 genes are left</span>
+<span class="hljs-comment"># [1] 654  12</span>
+
+d$samples$lib.size &lt;- colSums(d$counts) <span class="hljs-comment"># Update the "library size" (the total number of transcripts) for each sample</span>
+d$samples
+<span class="hljs-comment">#          group lib.size norm.factors</span>
+<span class="hljs-comment"># Sample1    hbr    37234            1</span>
+<span class="hljs-comment"># Sample2    hbr     3262            1</span>
+<span class="hljs-comment"># Sample3    hbr    38123            1</span>
+<span class="hljs-comment"># Sample4    hbr    45780            1</span>
+<span class="hljs-comment"># Sample5    hbr     4021            1</span>
+<span class="hljs-comment"># Sample6    hbr    46862            1</span>
+<span class="hljs-comment"># Sample7    uhr    63518            1</span>
+<span class="hljs-comment"># Sample8    uhr     4339            1</span>
+<span class="hljs-comment"># Sample9    uhr    64908            1</span>
+<span class="hljs-comment"># Sample10   uhr    41848            1</span>
+<span class="hljs-comment"># Sample11   uhr     3472            1</span>
+<span class="hljs-comment"># Sample12   uhr    42082            1</span>
+</div></code></pre>
+</li>
+</ol>
+</span>
+<!-- ## 3. Important Notes in the DGE analysis pipeline (cont.) -->
+<span style="font-size:0.8em">
+<ol start="5">
+<li>
+<p>Normalize the reads and plot them</p>
+<pre class="hljs"><code><div>d &lt;- calcNormFactors(d) <span class="hljs-comment"># This stores the scaling factors for normalization in d$samples$norm.factors</span>
+d
+<span class="hljs-comment"># An object of class "DGEList"</span>
+<span class="hljs-comment"># $counts</span>
+<span class="hljs-comment">#                    Sample1 Sample2 Sample3 Sample4 Sample5 Sample6 Sample7</span>
+<span class="hljs-comment"># ENSG00000198062.15       0       0       0       0       0       0       3</span>
+<span class="hljs-comment"># ENSG00000206195.11       3       0       3       1       0       1     107</span>
+<span class="hljs-comment"># ENSG00000271127.2        0       0       0       0       0       0      11</span>
+<span class="hljs-comment"># ENSG00000232775.6        0       0       0       1       1       0       2</span>
+<span class="hljs-comment"># ENSG00000272872.1        1       0       1       1       0       1      22</span>
+<span class="hljs-comment">#                    Sample8 Sample9 Sample10 Sample11 Sample12</span>
+<span class="hljs-comment"># ENSG00000198062.15       0       3        5        1        4</span>
+<span class="hljs-comment"># ENSG00000206195.11       0     107       72        1       71</span>
+<span class="hljs-comment"># ENSG00000271127.2        0      11        1        0        1</span>
+<span class="hljs-comment"># ENSG00000232775.6        2       0        5        5        0</span>
+<span class="hljs-comment"># ENSG00000272872.1        0      22       12        0       12</span>
+<span class="hljs-comment"># 649 more rows ...</span>
+
+<span class="hljs-comment"># $samples</span>
+<span class="hljs-comment">#         group lib.size norm.factors</span>
+<span class="hljs-comment"># Sample1   hbr    37234    0.7271597</span>
+<span class="hljs-comment"># Sample2   hbr     3262    2.4586720</span>
+<span class="hljs-comment"># Sample3   hbr    38123    0.7191907</span>
+<span class="hljs-comment"># Sample4   hbr    45780    0.7275449</span>
+<span class="hljs-comment"># Sample5   hbr     4021    2.2131558</span>
+<span class="hljs-comment"># 7 more rows ...</span>
+
+plotMDS(d, method=<span class="hljs-string">"bcv"</span>, col=as.numeric(d$samples$group))
+legend(<span class="hljs-string">"bottomleft"</span>, as.character(unique(d$samples$group)), col=<span class="hljs-number">1</span>:<span class="hljs-number">2</span>, pch=<span class="hljs-number">20</span>)
+</div></code></pre>
+</li>
+<li>
+<p>Fit a trend in CV vs. mean (single dispersion &amp; GLM)</p>
+<pre class="hljs"><code><div>d1 &lt;- estimateCommonDisp(d, verbose=<span class="hljs-literal">T</span>)
+<span class="hljs-comment"># Disp = 1.44585 , BCV = 1.2024 </span>
+d1 &lt;- estimateTagwiseDisp(d1)
+plotBCV(d1)
+
+<span class="hljs-comment"># Estimate and plot again, using a generalize linear model to get better fit</span>
+design.mat &lt;- model.matrix(~ <span class="hljs-number">0</span> + d$samples$group)
+colnames(design.mat) &lt;- levels(d$samples$group)
+d2 &lt;- estimateGLMCommonDisp(d,design.mat)
+d2 &lt;- estimateGLMTrendedDisp(d2,design.mat, method=<span class="hljs-string">"power"</span>)
+d2 &lt;- estimateGLMTagwiseDisp(d2,design.mat)
+plotBCV(d2)
+</div></code></pre>
+</li>
+</ol>
+</span>
+<!-- ## 3. Important Notes in the DGE analysis pipeline (cont.) -->
+<!-- ::: columns
+
+:::: column -->
+<img src="output/3_DiffGeneExpr_result/MDS_BCV.png">
+<!-- ::::
+
+:::: column -->
+<img src="output/3_DiffGeneExpr_result/GLM_BCV-mean.png">
+<!-- ::::
+
+::: -->
+<!-- ## 3. Important Notes in the DGE analysis pipeline (cont.) -->
+<span style="font-size:0.8em">
+<ol start="7">
+<li>DE analysis <strong>between the UHR - HBR</strong></li>
+</ol>
+<ul>
+<li>
+<p><strong>Genewise Exact Test for NB distributed counts between UHR - HBR</strong></p>
+<ul>
+<li>
+<blockquote>
+<p>&quot;so if the pair is c(&quot;A&quot;,&quot;B&quot;) then the comparison is B - A, so genes with positive log-fold change are up-regulated in group B compared with group A (and vice versa for genes with negative log-fold change).&quot;</p>
+</blockquote>
+</li>
+<li><code>pair=c(1,2)</code>: 1 = HBR, 2 = UHR</li>
+<li>UHR - HBR</li>
+</ul>
+</li>
+<li>
+<p><mark>We are finding DE genes for UHR/cancer</mark></p>
+<ul>
+<li>77 DEGs (32 down + 45 up)</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-comment"># compare groups 1 and 2 (HBR, UHR)</span>
+et12 &lt;- exactTest(d1, pair=c(<span class="hljs-number">1</span>,<span class="hljs-number">2</span>)) 
+
+<span class="hljs-comment"># Look at the top 10 DE genes</span>
+topTags(et12, n=<span class="hljs-number">10</span>)
+<span class="hljs-comment"># Comparison of groups:  uhr-hbr </span>
+<span class="hljs-comment">#                        logFC    logCPM       PValue          FDR</span>
+<span class="hljs-comment"># ENSG00000185686.18 11.105786 12.402565 5.243387e-09 3.429175e-06</span>
+<span class="hljs-comment"># ENSG00000133454.16  8.517490  9.904674 1.146932e-08 3.750466e-06</span>
+<span class="hljs-comment"># ENSG00000211677.2  11.084370 12.382343 5.950079e-08 1.297117e-05</span>
+<span class="hljs-comment"># ENSG00000280623.1   9.316181 10.666070 1.198342e-07 1.959289e-05</span>
+<span class="hljs-comment"># ENSG00000211666.2   9.212263 10.571262 1.051225e-06 1.375002e-04</span>
+<span class="hljs-comment"># ...</span>
+
+<span class="hljs-comment"># How many are up- or down-regulated?</span>
+de1 &lt;- decideTestsDGE(et12, adjust.method=<span class="hljs-string">"BH"</span>, p.value=<span class="hljs-number">0.05</span>)
+summary(de1) 
+<span class="hljs-comment">#        uhr-hbr</span>
+<span class="hljs-comment"># Down        32</span>
+<span class="hljs-comment"># NotSig     577</span>
+<span class="hljs-comment"># Up          45</span>
+
+
+<span class="hljs-comment">#### Plot log(fold change) vs. log(cpm) ####</span>
+<span class="hljs-comment">#   Significantly differently-expressed genes are shown in red</span>
+de1tags12 &lt;- rownames(d1)[as.logical(de1)]
+plotSmear(et12, de.tags=de1tags12)
+abline(h = c(-<span class="hljs-number">2</span>, <span class="hljs-number">2</span>), col = <span class="hljs-string">"blue"</span>)
+
+
+<span class="hljs-comment">#### Report the list of the differentially expressed genes (DEGs) ####</span>
+<span class="hljs-comment"># Get the summary table for: ***ALL DE genes with FDR &lt; 0.05***</span>
+DEG_fdr_tab = topTags(et12, n = <span class="hljs-literal">Inf</span>, adjust.method = <span class="hljs-string">"BH"</span>, p.value = <span class="hljs-number">0.05</span>) <span class="hljs-comment">#adjusted p-value cutoff</span>
+
+<span class="hljs-comment"># 77 DEGs</span>
+nrow(DEG_fdr_tab)
+<span class="hljs-comment"># [1] 77</span>
+<span class="hljs-comment"># 32 down + 45 up</span>
+summary(de1)
+<span class="hljs-comment">#        uhr-hbr</span>
+<span class="hljs-comment"># Down        32</span>
+<span class="hljs-comment"># NotSig     577</span>
+<span class="hljs-comment"># Up          45</span>
+
+<span class="hljs-comment">#### Output ####</span>
+<span class="hljs-keyword">library</span>(tidyverse)
+df_DEG_fdr_tab = rownames_to_column(as.data.frame(DEG_fdr_tab), var = <span class="hljs-string">"ENSG"</span>)
+
+<span class="hljs-comment"># 1. summary table</span>
+write_csv(df_DEG_fdr_tab, file=<span class="hljs-string">"../output/3_DiffGeneExpr_result/table_DEGs_fdr.csv"</span>)
+<span class="hljs-comment"># 2. list of DEGs</span>
+write.table( rownames(DEG_fdr_tab), file=<span class="hljs-string">"../output/3_DiffGeneExpr_result/ls_DEGs_fdr.txt"</span>,
+            quote = <span class="hljs-literal">FALSE</span>, sep=<span class="hljs-string">" "</span>, row.names = <span class="hljs-literal">FALSE</span>, col.names = <span class="hljs-literal">FALSE</span>)
+
+</div></code></pre>
+</li>
+</ul>
+</span>
+<!-- ## 3. Important Notes in the DGE analysis pipeline (cont.) -->
+<!-- ::: columns
+
+:::: column  -->
+<img src="output/3_DiffGeneExpr_result/smear_HBR-UHR.png" width="80%">
+<!-- ::::
+
+:::: column  -->
+<p>UHR - HBR
+<img src="output/3_DiffGeneExpr_result/vol_HBR-UHR.png" width="80%"></p>
+<!-- ::::
+
+::: -->
+<ul>
+<li>see <code>output/DiffGeneExpr.log</code> and <code>code/Rplots.pdf</code> for details.</li>
+</ul>
+<br>
+<h2 id="4-interpretation-of-dge-analysis">4. Interpretation of DGE analysis</h2>
+<p><a href="https://github.com/griffithlab/rnaseq_tutorial/wiki/RNAseq-Data">Based on the description of the experiments</a>, describe the biological function you think the differentially expressed genes should be associated with.</p>
+<ul>
+<li>
+<p><em>Universal Human Reference (UHR)</em> is total RNA isolated from a diverse set of 10 <em>cancer cell lines</em>.</p>
+</li>
+<li>
+<p><em>Human Brain Reference (HBR)</em> is total RNA isolated from the <em>brains</em> of 23 Caucasians, male and female, of varying age but <em>mostly 60-80 years old</em>.</p>
+</li>
+</ul>
+<h3 id="my-hypothesis-uhr---hbr">My hypothesis (UHR - HBR)</h3>
+<p>The mRNAs DE in UHR compared to HBR should be enriched in biological pathways involving:</p>
+<ul>
+<li>
+<p>Positive regulation in metabolism and cell proliferation (or cell cycle);</p>
+</li>
+<li>
+<p>Negatively associated with degeneration, cell death, apoptosis, neuronal functions.</p>
+</li>
+</ul>
+<h3 id="overrepresentation-test-in-david-future-direction-post-conversion-to-gene-symbol">Overrepresentation Test in DAVID (future direction, post conversion to gene symbol)</h3>
+
+</body>
+</html>
