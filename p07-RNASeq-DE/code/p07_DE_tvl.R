@@ -102,8 +102,11 @@ d$samples
 # (Think of the MDS plot as analogous to a principal components analysis plot)
 d <- calcNormFactors(d) # This stores the scaling factors for normalization in d$samples$norm.factors
 d
+# png(filename = "../output/3_DiffGeneExpr_result/MDS_BCV.png", 
+#     width = 6, height = 6, units = "in", res = 300)
 plotMDS(d, method="bcv", col=as.numeric(d$samples$group))
 legend("bottomleft", as.character(unique(d$samples$group)), col=1:2, pch=20)
+# dev.off()
 
 #### 7. Estimate and plot dispersion ####
 # First, plot dispersion (a measure similar to sd/mean) vs log(cpm)
@@ -124,7 +127,11 @@ colnames(design.mat) <- levels(d$samples$group)
 d2 <- estimateGLMCommonDisp(d,design.mat)
 d2 <- estimateGLMTrendedDisp(d2,design.mat, method="power")
 d2 <- estimateGLMTagwiseDisp(d2,design.mat)
+
+# png(filename = "../output/3_DiffGeneExpr_result/GLM_BCV-mean.png",
+#     width = 6, height = 6, units = "in", res = 300)
 plotBCV(d2)
+# dev.off()
 
 
 #### Now test for differential expression between the HBR and UHR groups ####
@@ -140,8 +147,12 @@ summary(de1) # How many are up- or down-regulated?
 #### Plot log(fold change) vs. log(cpm) ####
 # Significantly differently-expressed genes are shown in red
 de1tags12 <- rownames(d1)[as.logical(de1)]
+
+# png(filename = "../output/3_DiffGeneExpr_result/smear_HBR-UHR.png",
+#     width = 6, height = 6, units = "in", res = 300)
 plotSmear(et12, de.tags=de1tags12)
 abline(h = c(-2, 2), col = "blue")
+# dev.off()
 
 
 #### Report the list of the differentially expressed genes (DEGs) ####
